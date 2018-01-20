@@ -1,0 +1,47 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2008
+
+Project("{82F7DD84-3EB7-A383-48CD-372F581D25E2}") = "UnityYgocore", "Assembly-CSharp.csproj", "{9236076C-0244-EF97-6A48-81AB36AED9DD}"
+EndProject
+Project("{82F7DD84-3EB7-A383-48CD-372F581D25E2}") = "UnityYgocore", "Assembly-CSharp-Editor.csproj", "{E541A987-F686-3218-8AD2-A2BB5F3F8332}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9236076C-0244-EF97-6A48-81AB36AED9DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9236076C-0244-EF97-6A48-81AB36AED9DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9236076C-0244-EF97-6A48-81AB36AED9DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9236076C-0244-EF97-6A48-81AB36AED9DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E541A987-F686-3218-8AD2-A2BB5F3F8332}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E541A987-F686-3218-8AD2-A2BB5F3F8332}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E541A987-F686-3218-8AD2-A2BB5F3F8332}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E541A987-F686-3218-8AD2-A2BB5F3F8332}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+																																																																																																																																	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Assembly-CSharp.csproj
+		Policies = $0
+		$0.TextStylePolicy = $3
+		$1.FileWidth = 120
+		$1.TabsToSpaces = False
+		$1.EolMarker = Windows
+		$1.inheritsSet = VisualStudio
+		$1.inheritsScope = text/plain
+		$1.scope = text/x-csharp
+		$0.CSharpFormattingPolicy = $2
+		$2.inheritsSet = Mono
+		$2.inheritsScope = text/x-csharp
+		$2.scope = text/x-csharp
+		$3.FileWidth = 120
+		$3.TabsToSpaces = False
+		$3.EolMarker = Unix
+		$3.inheritsSet = VisualStudio
+		$3.inheritsScope = text/plain
+		$3.scope = text/plain
+	EndGlobalSection
+EndGlobal
