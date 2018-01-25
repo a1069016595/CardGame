@@ -809,6 +809,7 @@ public class Duel : MonoBehaviour, IDuel
         normalDele d1 = delegate
         {
             CreateCode(g, player, ComVal.code_AddCardToHand, reasonCard, ComVal.reason_Effect, reasonEffect);
+            FinishHandle();
         };
         AddDelegate(d1);
         AddCardToHand(g.ToList(),r);
@@ -2982,19 +2983,25 @@ public class Duel : MonoBehaviour, IDuel
     /// <param name="group"></param>
     /// <param name="dele"></param>
     /// <param name="num"></param>
-    public void SelectCardFromGroup(Group group, GroupCardSelectBack dele, int num, Player player,bool isMax=true)
+    public void SelectCardFromGroup(Group group, GroupCardSelectBack dele, int num, Player player, bool isMax = true)
     {
         if (num == 0)
         {
             console.Log("error");
+            return;
+        }
+        if (group.GroupNum == num)
+        {
+            dele(group);
+            return;
         }
         if (group.IsHandAndField())
         {
-            duelUIManager.SelectFieldCard(group, num, dele, player.isMy,isMax);
+            duelUIManager.SelectFieldCard(group, num, dele, player.isMy, isMax);
         }
         else
         {
-            duelUIManager.ShowSelectCardUI(group, dele, num, player.isMy,isMax);
+            duelUIManager.ShowSelectCardUI(group, dele, num, player.isMy, isMax);
         }
     }
 
