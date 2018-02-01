@@ -104,6 +104,8 @@ public class Card
 
     public Card EffectDataCard;
 
+    List<Pointer> curPointerList=new List<Pointer>();
+
     /// <summary>
     /// 生成卡片信息
     /// </summary>
@@ -984,6 +986,51 @@ public class Card
         return false;
     }
     #endregion
+
+    #region 指示物相关
+
+    public void AddPointer(string pointerName,int num,int max)
+    {
+        foreach (var item in curPointerList)
+        {
+            if(item.name==pointerName)
+            {
+                item.AddVal(num);
+                return;
+            }
+        }
+        curPointerList.Add(new Pointer(pointerName,max));
+        AddPointer(pointerName, num,max);
+    }
+
+    public void RemovePoint(string pointerName, int num)
+    {
+        foreach (var item in curPointerList)
+        {
+            if (item.name == pointerName)
+            {
+                item.RemoveVal(num);
+                return;
+            }
+        }
+    }
+
+    public bool HavePointer(string pointerName, int num)
+    {
+        foreach (var item in curPointerList)
+        {
+            if (item.name == pointerName)
+            {
+                 if(item.num >= num)
+                 {
+                     return true;
+                 }
+            }
+        }
+        return false;
+    }
+
+    #endregion
 }
 
 /// <summary>
@@ -1022,6 +1069,32 @@ public class EffectLauchCountLimit
     public void ResetLauchCount()
     {
         lauchCount = 0;
+    }
+}
+
+public class Pointer
+{
+    public string name;
+    public int num;
+    public int max;
+
+    public Pointer(string name,int max)
+    {
+        this.name = name;
+        num = 0;
+        this.max = max;
+    }
+
+    public void AddVal(int val)
+    {
+        num += val;
+        num = Math.Min(max, num);
+    }
+
+    public void RemoveVal(int val)
+    {
+        num -= val;
+        num = Math.Max(0, num);
     }
 }
 

@@ -250,7 +250,7 @@ public static class ComVal
     public const int cardEffectType_Multiple = 0x200;//群体效果
     public const int cardEffectType_field = 0x400;//场地
 
-    //特殊召唤效果
+    //不加入连锁
     public const int cardEffectType_notInChain = 0x1000;
 
     public const int cardEffectType_unableReset = 0x2000;//改变区域会重置 用于状态效果
@@ -539,6 +539,13 @@ public class ComStr
     public const string KeyWord_MaskHERO = "假面英雄";
     public const string KeyWord_Lightsworn = "光道";
     public const string KeyWord_DragUnity = "龙骑兵团";
+    public const string KeyWord_SixSamurai = "六武众";
+    #endregion
+
+    #region 
+
+    public const string Pointer_Samurai = "武士道指示物";
+
     #endregion
 
     #region 提示文字
