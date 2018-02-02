@@ -756,7 +756,7 @@ public class Card
         return list;
     }
 
-    public bool CanLauchTriggerEffect(Code code, Chain chain, bool isDelayode = false)
+    public bool CanLauchTriggerEffect(Code code, Chain chain, bool isDelayode, bool isNotInChain = false)
     {
         int effectType;
         effectType = ComVal.cardEffectType_triggerEffect;
@@ -789,7 +789,10 @@ public class Card
             }
             if (ComVal.isBind(code.code, item.code))
             {
-
+                if (isNotInChain && !item.cardEffectType.IsBind(ComVal.cardEffectType_notInChain))
+                {
+                    return false;
+                }
                 if (item.CanBeLaunch(code) && !chain.ContainEffect(item.code, this, item) && item.IsBindCardEffectType(effectType))
                 {
                     return true;
@@ -829,6 +832,22 @@ public class Card
         foreach (var item in lauchEffectList)
         {
             if (item.cardEffectType.IsBind(ComVal.cardEffectType_mustLauch))
+            {
+                if (item.CanBeLaunch(code) && !chain.ContainEffect(item.code, this, item))
+                {
+                    list.Add(item);
+                }
+            }
+        }
+        return list;
+    }
+
+    public List<LauchEffect> GetNotInChainEffectList(Code code,Chain chain)
+    {
+        List<LauchEffect> list = new List<LauchEffect>();
+        foreach (var item in lauchEffectList)
+        {
+            if (item.cardEffectType.IsBind(ComVal.cardEffectType_notInChain))
             {
                 if (item.CanBeLaunch(code) && !chain.ContainEffect(item.code, this, item))
                 {
@@ -1028,6 +1047,18 @@ public class Card
             }
         }
         return false;
+    }
+
+    public int GetPointerNum(string pointerName)
+    {
+        foreach (var item in curPointerList)
+        {
+            if (item.name == pointerName)
+            {
+                return item.num;
+            }
+        }
+        return 0;
     }
 
     #endregion

@@ -215,6 +215,7 @@ public static class ComVal
     public const int category_disAbleEffect = 0x40000;
     public const int category_disAbleSpSummon = 0x80000;
     public const int category_equipCard = 0x100000;
+    public const int category_pointer = 0x200000;
     #endregion
 
     #region 原因

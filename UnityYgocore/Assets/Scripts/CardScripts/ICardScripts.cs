@@ -7,5 +7,6 @@ public interface ICardScripts
 
     bool CheckLauch(IDuel duel, Card card, LauchEffect effect, Code code);
 
+
 }
 

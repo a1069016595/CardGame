@@ -16,6 +16,7 @@ public delegate void CardDele(Card card);
 public delegate void normalDele();
 public delegate void BoolDele(bool val);
 public delegate bool Filter(Card card);
+//public delegate bool Filter(Card card,Card effectCard);
 public delegate void IntDele(int val);
 
 /// <summary>
@@ -2561,50 +2562,6 @@ public class Duel : MonoBehaviour, IDuel
         }
     }
 
-    /// <summary>
-    /// TODO：处理必发效果
-    /// </summary>
-    void HandleMustLauchEffect(Player player)
-    {
-        List<Card> canLauchEffectList = new List<Card>();
-        canLauchEffectList = CheckCanLauchEffect(player, curCode, false);
-
-        if (canLauchEffectList.Count == 0)
-        {
-            canLauchEffectList = CheckCanLauchEffect(GetOpsitePlayer(player), curCode, false);
-            player = GetOpsitePlayer(player);
-        }
-
-        List<LauchEffect> list = new List<LauchEffect>();
-        foreach (var item in canLauchEffectList)
-        {
-            list.AddRange(item.GetMustLauchEffectList(curCode, curChain));
-            console.Log("必发效果数量：" + list.Count);
-        }
-        if (list.Count != 0)
-        {
-            LauchEffect effect = list[0];
-            list.RemoveAt(0);
-
-            normalDele afterCost = delegate
-            {
-                normalDele afterSelectTarget = delegate
-                {
-                    curCode.code = curCode.code | ComVal.code_EffectLanch;
-                    console.Log("发动效果");
-                    AddToChain(effect);
-                    HandleMustLauchEffect(player);
-                };
-                SelectTarget(effect, afterSelectTarget);
-            };
-            AddDelegate(afterCost, "Cost回调");
-            CostTheEffect(effect);
-        }
-        else
-        {
-            FinishHandle();
-        }
-    }
 
     /// <summary>
     /// 生成时点 连锁的效果不会改变时点的group
@@ -2682,7 +2639,99 @@ public class Duel : MonoBehaviour, IDuel
             }
         };
         AddDelegate(d1, "检测连锁");
-        HandleMustLauchEffect(targetPlayer);
+        normalDele d = delegate
+        {
+            HandleMustLauchEffect(targetPlayer);
+        };
+        AddDelegate(d);
+        List<LauchEffect> list = GetNotInChainEffect(targetPlayer);
+        HandleNotInChainEffect(list);
+    }
+
+    private void HandleNotInChainEffect(List<LauchEffect> list)
+    {
+        normalDele d = delegate
+        {
+            HandleNotInChainEffect(list);
+        };
+        if (list.Count != 0)
+        {
+            LauchEffect effect = list[0];
+            list.RemoveAt(0);
+
+            normalDele d1 = delegate
+            {
+                AddDelegate(d);
+                console.Log("发动不入连锁效果");
+                effect.Operate();
+            };
+            AddDelegate(d1);
+            effect.Cost();
+        }
+        else
+        {
+            FinishHandle();
+        }
+    }
+
+    private List<LauchEffect> GetNotInChainEffect(Player player)
+    {
+        List<Card> canLauchEffectList = new List<Card>();
+        canLauchEffectList = CheckCanLauchEffect(player, curCode, false, true);
+        canLauchEffectList.AddRange(CheckCanLauchEffect(GetOpsitePlayer(player), curCode, false, true));
+
+        List<LauchEffect> list = new List<LauchEffect>();
+        foreach (var item in canLauchEffectList)
+        {
+            list.AddRange(item.GetNotInChainEffectList(curCode, curChain));
+            console.Log("不进入连锁效果数量：" + list.Count);
+        }
+        return list;
+    }
+
+    /// <summary>
+    /// TODO：处理必发效果
+    /// </summary>
+    void HandleMustLauchEffect(Player player)
+    {
+        List<Card> canLauchEffectList = new List<Card>();
+        canLauchEffectList = CheckCanLauchEffect(player, curCode, false);
+
+        if (canLauchEffectList.Count == 0)
+        {
+            canLauchEffectList = CheckCanLauchEffect(GetOpsitePlayer(player), curCode, false);
+            player = GetOpsitePlayer(player);
+        }
+
+        List<LauchEffect> list = new List<LauchEffect>();
+        foreach (var item in canLauchEffectList)
+        {
+            list.AddRange(item.GetMustLauchEffectList(curCode, curChain));
+            console.Log("必发效果数量：" + list.Count);
+        }
+        if (list.Count != 0)
+        {
+            LauchEffect effect = list[0];
+            list.RemoveAt(0);
+
+            normalDele afterCost = delegate
+            {
+                normalDele afterSelectTarget = delegate
+                {
+                    curCode.code = curCode.code | ComVal.code_EffectLanch;
+                    console.Log("发动效果");
+                    AddToChain(effect);
+                    HandleMustLauchEffect(player);
+                };
+                SelectTarget(effect, afterSelectTarget);
+            };
+            AddDelegate(afterCost, "Cost回调");
+            CostTheEffect(effect);
+        }
+        else
+        {
+            FinishHandle();
+        }
     }
 
     /// <summary>
@@ -2804,14 +2853,14 @@ public class Duel : MonoBehaviour, IDuel
     /// <summary>
     /// 检测当前时点可发动的效果,并将其加入列表之中
     /// </summary>
-    List<Card> CheckCanLauchEffect(Player player, Code code, bool isTrigger)
+    List<Card> CheckCanLauchEffect(Player player, Code code, bool isTrigger,bool isNotInChain=false)
     {
         List<Card> result = new List<Card>();
         foreach (var item in player.group_TrapCard.cardList)
         {
             if (item != null)
             {
-                if (item.CanLauchTriggerEffect(code, curChain, isTrigger))
+                if (item.CanLauchTriggerEffect(code, curChain, isTrigger,isNotInChain))
                 {
                     result.Add(item);
                 }
@@ -2821,7 +2870,7 @@ public class Duel : MonoBehaviour, IDuel
         {
             if (item != null)
             {
-                if (item.CanLauchTriggerEffect(code, curChain, isTrigger))
+                if (item.CanLauchTriggerEffect(code, curChain, isTrigger,isNotInChain))
                 {
                     result.Add(item);
                 }
@@ -2831,7 +2880,7 @@ public class Duel : MonoBehaviour, IDuel
         {
             if (item != null)
             {
-                if (item.CanLauchTriggerEffect(code, curChain, isTrigger))
+                if (item.CanLauchTriggerEffect(code, curChain, isTrigger, isNotInChain))
                 {
                     result.Add(item);
                 }
@@ -2841,7 +2890,7 @@ public class Duel : MonoBehaviour, IDuel
         {
             if (item != null)
             {
-                if (item.CanLauchTriggerEffect(code, curChain, isTrigger))
+                if (item.CanLauchTriggerEffect(code, curChain, isTrigger, isNotInChain))
                 {
                     result.Add(item);
                 }
@@ -2851,7 +2900,7 @@ public class Duel : MonoBehaviour, IDuel
         {
             if (item != null)
             {
-                if (item.CanLauchTriggerEffect(code, curChain, isTrigger))
+                if (item.CanLauchTriggerEffect(code, curChain, isTrigger, isNotInChain))
                 {
                     result.Add(item);
                 }
@@ -2861,7 +2910,7 @@ public class Duel : MonoBehaviour, IDuel
         {
             if (item != null)
             {
-                if (item.CanLauchTriggerEffect(code, curChain, isTrigger))
+                if (item.CanLauchTriggerEffect(code, curChain, isTrigger, isNotInChain))
                 {
                     result.Add(item);
                 }
@@ -2869,7 +2918,7 @@ public class Duel : MonoBehaviour, IDuel
         }
         if(player.fieldSpell!=null)
         {
-            if (player.fieldSpell.CanLauchTriggerEffect(code, curChain, isTrigger))
+            if (player.fieldSpell.CanLauchTriggerEffect(code, curChain, isTrigger, isNotInChain))
             {
                 result.Add(player.fieldSpell);
             }

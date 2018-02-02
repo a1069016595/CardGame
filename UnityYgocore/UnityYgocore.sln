@@ -1,9 +1,9 @@
+﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2008
-
-Project("{82F7DD84-3EB7-A383-48CD-372F581D25E2}") = "UnityYgocore", "Assembly-CSharp.csproj", "{9236076C-0244-EF97-6A48-81AB36AED9DD}"
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityYgocore", "Assembly-CSharp.csproj", "{9236076C-0244-EF97-6A48-81AB36AED9DD}"
 EndProject
-Project("{82F7DD84-3EB7-A383-48CD-372F581D25E2}") = "UnityYgocore", "Assembly-CSharp-Editor.csproj", "{E541A987-F686-3218-8AD2-A2BB5F3F8332}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityYgocore", "Assembly-CSharp-Editor.csproj", "{E541A987-F686-3218-8AD2-A2BB5F3F8332}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

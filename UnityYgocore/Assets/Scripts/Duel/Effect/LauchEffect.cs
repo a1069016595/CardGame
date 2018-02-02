@@ -9,11 +9,13 @@ public class LauchEffect:BaseEffect
     public string effectID;//用于限制一回合一次的效果
     public Int64 code;
     public int lauchPhase;
+    public int lauchRound;//确认发动的回合
 
     public Cost cost;
     public Target getTarget;
     public Operation operation;
     public CheckLaunch checkLauch;
+
 
 
     Group targetGroup;
@@ -102,6 +104,7 @@ public class LauchEffect:BaseEffect
         {
             duel.FinishHandle();
         }
+        lauchRound = duel.roundCount;
     }
 
     public void GetTarget(normalDele theDele)
