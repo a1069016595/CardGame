@@ -9,11 +9,8 @@ public class C27821104 : ICardScripts
 {
     public static Card mCard;
 
-
     public void InitialEffect(Card card, Player player, IDuel duel)
     {
-        mCard = card;
-
         LauchEffect e1 = new LauchEffect();
         e1.SetCardEffectType(ComVal.cardEffectType_normalLauch | ComVal.cardEffectType_chooseLauch);
         e1.SetCategory(ComVal.category_destroy | ComVal.category_spSummon);
@@ -80,7 +77,7 @@ public class C27821104 : ICardScripts
 
     public void Operation(IDuel duel, Card card, LauchEffect effect, Group group = null)
     {
-
+        mCard = card;
         Card target = card.EffectDataCard;
         Group g = duel.GetIncludeNameCardFromArea(ComStr.KeyWord_SixSamurai, false, card.controller, ComVal.cardType_Monster, ComVal.Area_MainDeck, Fiter);
         if (!card.curArea.IsBind(ComVal.Area_Monster) || g.GroupNum == 0)

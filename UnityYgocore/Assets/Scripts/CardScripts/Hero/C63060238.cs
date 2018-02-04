@@ -27,7 +27,7 @@ public class C63060238 : ICardScripts
         e2.SetLauchPhase(ComVal.Phase_Mainphase);
         duel.ResignEffect(e2, card, player);
 
-        card.SetCardCountLimit(new LauchEffect[] { e1, e2 }, 1);
+        card.SetCardCountLimit(e1, e2 , 1);
     }
 
     public void Operation(IDuel duel, Card card, LauchEffect effect, Group group = null)

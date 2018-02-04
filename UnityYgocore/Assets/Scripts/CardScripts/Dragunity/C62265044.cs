@@ -38,7 +38,7 @@ public class C62265044 : ICardScripts
         e3.SetDescribe("从卡组把1只龙族怪兽送去墓地");
         duel.ResignEffect(e3, card, player);
 
-        card.SetCardCountLimit(new LauchEffect[] { e2, e3 }, 1);
+        card.SetCardCountLimit(e2, e3 , 1);
     }
 
     public bool CheckLauch(IDuel duel, Card card, LauchEffect effect, Code code)

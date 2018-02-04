@@ -22,7 +22,7 @@ public class C58481572 : ICardScripts
         e2.SetOperation(Operation);
         e2.SetCheckLauch(CheckLauch);
         duel.ResignEffect(e2, card, player);
-        card.SetCardCountLimit(new LauchEffect[] { e2 }, 1);
+        card.SetCardCountLimit(e2 , 1);
     }
 
     private bool condition(IDuel duel, Card card, BaseEffect e,Card targetCard)

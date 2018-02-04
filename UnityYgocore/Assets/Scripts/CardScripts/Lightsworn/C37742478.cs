@@ -76,9 +76,9 @@ public class C37742478 : ICardScripts
         if (duel.GetCurPhase() == ComVal.Phase_Battlephase)
         {
             AttackEvent e = duel.GetCurAttackEvent();
-            if (e != null)
+            if (e != null && !e.IsInvalid())
             {
-                if(!e.IsDirectAttack())
+                if (!e.IsDirectAttack())
                 {
                     if (e.Attacker.controller == card.controller && e.Attacker.GetCurAttribute().IsBind(ComVal.CardAttr_Light))
                     {
@@ -89,7 +89,7 @@ public class C37742478 : ICardScripts
                         return true;
                     }
                 }
-                
+
             }
         }
         return false;

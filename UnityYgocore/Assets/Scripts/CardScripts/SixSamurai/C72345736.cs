@@ -28,6 +28,7 @@ public class C72345736 : ICardScripts
         e2.SetCost(Cost);
         e2.SetLauchArea(ComVal.Area_NormalTrap);
         e2.SetOperation(Operation1);
+        duel.ResignEffect(e2, card, player);
 
         LauchEffect e3 = new LauchEffect();
         e3.SetCardEffectType(ComVal.cardEffectType_normalLauch);
@@ -50,7 +51,7 @@ public class C72345736 : ICardScripts
 
     private bool CheckLauch1(IDuel duel, Card card, LauchEffect effect, Code code)
     {
-       return card.GetPointerNum(ComStr.Pointer_Samurai)>0;
+        return card.GetPointerNum(ComStr.Pointer_Samurai) > 0;
     }
 
     private void Cost(IDuel duel, Card card, LauchEffect effect)
@@ -65,8 +66,6 @@ public class C72345736 : ICardScripts
         duel.DrawCard(card.controller, card.GetPointerNum(ComStr.Pointer_Samurai), card, effect);
     }
 
-
-
     public void Operation(IDuel duel, Card card, LauchEffect effect, Group group = null)
     {
         card.AddPointer(ComStr.Pointer_Samurai, 1, 2);
@@ -75,7 +74,7 @@ public class C72345736 : ICardScripts
     public bool CheckLauch(IDuel duel, Card card, LauchEffect effect, Code code)
     {
         Group g = code.group.GetFitlerGroup(Fiter);
-        return g.GroupNum > 1;
+        return g.GroupNum >= 1;
     }
 
     private bool Fiter(Card card)

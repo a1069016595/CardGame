@@ -20,7 +20,7 @@ public class C04779823 : ICardScripts
         e1.SetOperation(Operation);
         e1.SetGetTarget(GetTarget);
         duel.ResignEffect(e1, card, player);
-        card.SetCardCountLimit(new LauchEffect[1] { e1 }, 1);
+        card.SetCardCountLimit( e1 , 1);
 
         LauchEffect e2 = new LauchEffect();
         e2.SetCardEffectType(ComVal.cardEffectType_chooseLauch);

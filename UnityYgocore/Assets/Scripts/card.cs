@@ -494,9 +494,16 @@ public class Card
 
     #endregion
 
-    public void SetCardCountLimit(LauchEffect[] list, int val)
+    public void SetCardCountLimit(LauchEffect e1, int val)
     {
-        List<LauchEffect> l = new List<LauchEffect>(list);
+        List<LauchEffect> l = new List<LauchEffect> { e1};
+        EffectLauchCountLimit limit = new EffectLauchCountLimit(l, val);
+        effectLauchCountLimitList.Add(limit);
+    }
+
+    public void SetCardCountLimit(LauchEffect e1,LauchEffect e2, int val)
+    {
+        List<LauchEffect> l = new List<LauchEffect> { e1,e2 };
         EffectLauchCountLimit limit = new EffectLauchCountLimit(l, val);
         effectLauchCountLimitList.Add(limit);
     }

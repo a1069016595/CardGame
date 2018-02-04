@@ -37,7 +37,7 @@ public class C00423585 : ICardScripts
         e3.SetCost(Cost);
         e3.SetCheckLauch(CheckLauch1);
         e3.SetLauchPhase(ComVal.Phase_Mainphase);
-        card.SetCardCountLimit(new LauchEffect[1] { e3 }, 1);
+        card.SetCardCountLimit(e3 , 1);
         duel.ResignEffect(e3, card, player);
     }
 

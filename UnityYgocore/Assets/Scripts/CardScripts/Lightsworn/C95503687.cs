@@ -17,7 +17,7 @@ public class C95503687 : ICardScripts
         e1.SetCost(Cost);
         e1.SetCheckLauch(CheckLauch);
         e1.SetOperation(Operation);
-        card.SetCardCountLimit(new LauchEffect[1] { e1 }, 1);
+        card.SetCardCountLimit(e1, 1);
         duel.ResignEffect(e1, card, player);
 
         LauchEffect e2 = new LauchEffect();
