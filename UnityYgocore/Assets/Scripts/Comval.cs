@@ -262,7 +262,7 @@ public static class ComVal
     public const int cardEffectType_lauchEffect = cardEffectType_mustLauch | cardEffectType_mustToChooseLauch | cardEffectType_chooseLauch
                                                 | cardEffectType_normalLauch;
 
-    public const int cardEffectType_triggerEffect = cardEffectType_mustLauch | cardEffectType_mustToChooseLauch | cardEffectType_chooseLauch;//触发效果
+    public const int cardEffectType_triggerEffect = cardEffectType_mustLauch | cardEffectType_mustToChooseLauch | cardEffectType_chooseLauch | cardEffectType_notInChain;//触发效果
     #endregion
 
     #region 状态效果种类

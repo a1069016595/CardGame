@@ -2652,6 +2652,7 @@ public class Duel : MonoBehaviour, IDuel
         };
         AddDelegate(d);
         List<LauchEffect> list = GetNotInChainEffect(targetPlayer);
+        Debug.Log(list.Count);
         HandleNotInChainEffect(list);
     }
 

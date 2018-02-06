@@ -69,6 +69,7 @@ public class C72345736 : ICardScripts
     public void Operation(IDuel duel, Card card, LauchEffect effect, Group group = null)
     {
         card.AddPointer(ComStr.Pointer_Samurai, 1, 2);
+        duel.FinishHandle();
     }
 
     public bool CheckLauch(IDuel duel, Card card, LauchEffect effect, Code code)
