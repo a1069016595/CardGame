@@ -18,7 +18,7 @@ public class LauchEffect:BaseEffect
 
 
 
-    Group targetGroup;
+    public Group targetGroup;
 
     public LauchEffect ()
     {

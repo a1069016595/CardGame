@@ -34,3 +34,6 @@ D:\UnityProject\UnityYgocore\Temp\bin\Debug\UnityEngine.PlaymodeTestsRunner.xml
 D:\UnityProject\UnityYgocore\Temp\bin\Debug\UnityEngine.Analytics.xml
 D:\UnityProject\UnityYgocore\Temp\bin\Debug\UnityEngine.HoloLens.xml
 D:\UnityProject\UnityYgocore\Temp\bin\Debug\UnityEngine.VR.xml
+B:\Users\DF\Documents\GitHub\UnityProject\UnityYgocore\obj\Debug\Assembly-CSharp.csprojResolveAssemblyReference.cache
+B:\Users\DF\Documents\GitHub\UnityProject\UnityYgocore\obj\Debug\Assembly-CSharp.dll
+B:\Users\DF\Documents\GitHub\UnityProject\UnityYgocore\obj\Debug\Assembly-CSharp.pdb

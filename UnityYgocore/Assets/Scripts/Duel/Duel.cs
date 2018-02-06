@@ -818,7 +818,14 @@ public class Duel : MonoBehaviour, IDuel
 
     public void AddCardToHandFromArea(int area, Card c, Player player, Card card, LauchEffect effect)
     {
-        AddCardToHandFromArea(area, c.ToGroup(), player, card, effect);
+        if(area.IsBind(ComVal.Area_MainDeck))
+        {
+            AddCardToHandFromMainDeck(c, player, card, effect);
+        }
+        else
+        {
+            AddCardToHandFromArea(area, c.ToGroup(), player, card, effect);
+        }
     }
 
     private void AddCardToHand(List<Card> cardList,Reason r)
@@ -2659,14 +2666,32 @@ public class Duel : MonoBehaviour, IDuel
             LauchEffect effect = list[0];
             list.RemoveAt(0);
 
-            normalDele d1 = delegate
+            GetMes callBack = delegate(bool val)
             {
-                AddDelegate(d);
-                console.Log("发动不入连锁效果");
-                effect.Operate();
+                if (val)
+                {
+                    normalDele d1 = delegate
+                    {
+                        AddDelegate(d);
+                        console.Log("发动不入连锁效果");
+                        effect.Operate();
+                    };
+                    AddDelegate(d1);
+                    effect.Cost();
+                }
+                else
+                {
+                    d();
+                }
             };
-            AddDelegate(d1);
-            effect.Cost();
+            if(effect.cardEffectType.IsBind(ComVal.cardEffectType_mustNotInChain))
+            {
+                callBack(true);
+            }
+            else
+            {
+                ChooseToLauchEffect(curCode, callBack, effect.ownerCard.controller);
+            }
         }
         else
         {

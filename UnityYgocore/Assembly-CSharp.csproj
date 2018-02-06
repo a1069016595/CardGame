@@ -111,12 +111,15 @@
      <Compile Include="Assets\Scripts\CardScripts\Lightsworn\ICarScripts.cs" />
      <Compile Include="Assets\Scripts\CardScripts\SixSamurai\C01498130.cs" />
      <Compile Include="Assets\Scripts\CardScripts\SixSamurai\C02511717.cs" />
+     <Compile Include="Assets\Scripts\CardScripts\SixSamurai\C21007444.cs" />
      <Compile Include="Assets\Scripts\CardScripts\SixSamurai\C27821104.cs" />
      <Compile Include="Assets\Scripts\CardScripts\SixSamurai\C27970830.cs" />
      <Compile Include="Assets\Scripts\CardScripts\SixSamurai\C29981921.cs" />
+     <Compile Include="Assets\Scripts\CardScripts\SixSamurai\C41458579.cs" />
      <Compile Include="Assets\Scripts\CardScripts\SixSamurai\C49721904.cs" />
      <Compile Include="Assets\Scripts\CardScripts\SixSamurai\C61737116.cs" />
      <Compile Include="Assets\Scripts\CardScripts\SixSamurai\C72345736.cs" />
+     <Compile Include="Assets\Scripts\CardScripts\SixSamurai\C75525309.cs" />
      <Compile Include="Assets\Scripts\Card_Edit.cs" />
      <Compile Include="Assets\Scripts\Card_Field.cs" />
      <Compile Include="Assets\Scripts\Card_Hand.cs" />

@@ -58,3 +58,6 @@ D:\UnityProject\UnityYgocore\Temp\bin\Debug\UnityEditor.iOS.Extensions.Xcode.xml
 D:\UnityProject\UnityYgocore\obj\Debug\Assembly-CSharp-Editor.csprojResolveAssemblyReference.cache
 D:\UnityProject\UnityYgocore\obj\Debug\Assembly-CSharp-Editor.dll
 D:\UnityProject\UnityYgocore\obj\Debug\Assembly-CSharp-Editor.pdb
+B:\Users\DF\Documents\GitHub\UnityProject\UnityYgocore\obj\Debug\Assembly-CSharp-Editor.csprojResolveAssemblyReference.cache
+B:\Users\DF\Documents\GitHub\UnityProject\UnityYgocore\obj\Debug\Assembly-CSharp-Editor.dll
+B:\Users\DF\Documents\GitHub\UnityProject\UnityYgocore\obj\Debug\Assembly-CSharp-Editor.pdb

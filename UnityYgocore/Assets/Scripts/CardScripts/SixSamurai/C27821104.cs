@@ -22,7 +22,7 @@ public class C27821104 : ICardScripts
         duel.ResignEffect(e1, card, player);
 
         LauchEffect e2 = new LauchEffect();
-        e2.SetCardEffectType(ComVal.cardEffectType_notInChain);
+        e2.SetCardEffectType(ComVal.cardEffectType_mustNotInChain);
         e2.SetCategory(ComVal.category_destroy);
         e2.SetCheckLauch(CheckLauch1);
         e2.SetCode(ComVal.code_EnterEndPhase);

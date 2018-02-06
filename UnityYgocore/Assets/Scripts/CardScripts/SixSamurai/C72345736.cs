@@ -12,7 +12,7 @@ public class C72345736 : ICardScripts
     public void InitialEffect(Card card, Player player, IDuel duel)
     {
         LauchEffect e1 = new LauchEffect();
-        e1.SetCardEffectType(ComVal.cardEffectType_notInChain);
+        e1.SetCardEffectType(ComVal.cardEffectType_mustNotInChain);
         e1.SetCategory(ComVal.category_pointer);
         e1.SetCheckLauch(CheckLauch);
         e1.SetCode(ComVal.code_NormalSummon | ComVal.code_SpecialSummon);

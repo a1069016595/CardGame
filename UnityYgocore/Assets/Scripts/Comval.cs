@@ -252,9 +252,12 @@ public static class ComVal
     public const int cardEffectType_field = 0x400;//场地
 
     //不加入连锁
-    public const int cardEffectType_notInChain = 0x1000;
+    public const int cardEffectType_chooseNotInChain = 0x1000;
 
     public const int cardEffectType_unableReset = 0x2000;//改变区域会重置 用于状态效果
+    public const int cardEffectType_mustNotInChain = 0x4000;
+
+    public const int cardEffectType_notInChain = cardEffectType_chooseNotInChain|cardEffectType_mustNotInChain;
 
     public const int cardEffectType_lauchEffect = cardEffectType_mustLauch | cardEffectType_mustToChooseLauch | cardEffectType_chooseLauch
                                                 | cardEffectType_normalLauch;
@@ -541,9 +544,10 @@ public class ComStr
     public const string KeyWord_Lightsworn = "光道";
     public const string KeyWord_DragUnity = "龙骑兵团";
     public const string KeyWord_SixSamurai = "六武众";
+    public const string KeyWord_Shien = "紫炎";
     #endregion
 
-    #region 
+    #region 指示物
 
     public const string Pointer_Samurai = "武士道指示物";
 
