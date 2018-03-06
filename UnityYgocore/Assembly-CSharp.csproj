@@ -142,6 +142,7 @@
      <Compile Include="Assets\Scripts\Duel\Code.cs" />
      <Compile Include="Assets\Scripts\Duel\Deck.cs" />
      <Compile Include="Assets\Scripts\Duel\DeckUI.cs" />
+     <Compile Include="Assets\Scripts\Duel\DelayAction.cs" />
      <Compile Include="Assets\Scripts\Duel\DeleQueue.cs" />
      <Compile Include="Assets\Scripts\Duel\Duel.cs" />
      <Compile Include="Assets\Scripts\Duel\DuelEventSys.cs" />
@@ -216,6 +217,7 @@
      <Compile Include="Assets\Scripts\UIScripts\ChainUICtr.cs" />
      <Compile Include="Assets\Scripts\UIScripts\DialogBoxUI.cs" />
      <Compile Include="Assets\Scripts\UIScripts\EditDeckUI.cs" />
+     <Compile Include="Assets\Scripts\UIScripts\FieldCardMesUI.cs" />
      <Compile Include="Assets\Scripts\UIScripts\HandCardUI.cs" />
      <Compile Include="Assets\Scripts\UIScripts\LPChangeUI.cs" />
      <Compile Include="Assets\Scripts\UIScripts\LPSliderUI.cs" />

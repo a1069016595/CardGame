@@ -135,5 +135,8 @@ public enum DuelEvent
 
     event_operateCard,
     event_changePhase,
+
+    uiEvent_ShowFieldCardMes,
+    uiEvent_HideFieldCardMes,
     end,
 }

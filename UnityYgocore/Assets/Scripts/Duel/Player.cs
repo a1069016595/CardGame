@@ -355,7 +355,6 @@ public class Player
         if (area == ComVal.Area_Monster)
         {
             card = group_MonsterCard.GetCard(rank);
-
             return card;
         }
         else if (area == ComVal.Area_NormalTrap)

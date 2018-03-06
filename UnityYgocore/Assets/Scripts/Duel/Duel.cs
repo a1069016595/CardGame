@@ -19,6 +19,7 @@ public delegate bool Filter(Card card);
 //public delegate bool Filter(Card card,Card effectCard);
 public delegate void IntDele(int val);
 
+
 /// <summary>
 /// 处理游戏的逻辑
 /// </summary>
@@ -97,6 +98,8 @@ public class Duel : MonoBehaviour, IDuel
     public bool IsNetWork = false;
 
     Console console;
+
+    List<normalDele> duelActionList=new List<normalDele>();
 
     void Awake()
     {
@@ -1729,7 +1732,7 @@ public class Duel : MonoBehaviour, IDuel
         }
         else if (area == ComVal.Area_FieldSpell)
         {
-            Card card = player.fieldSpell;
+            Card card = player.GetCard(area, rank);
             return GetTrapOption(card);
         }
         else if (area == ComVal.Area_MainDeck)
@@ -1751,6 +1754,12 @@ public class Duel : MonoBehaviour, IDuel
         return optionList;
     }
 
+    public Card GetCard(bool isMy,int area,int rank)
+    {
+        Player player = GetPlayer(isMy);
+        Card card = player.GetCard(area, rank);
+        return card;
+    }
 
     #region 获取选项
 
@@ -2652,7 +2661,6 @@ public class Duel : MonoBehaviour, IDuel
         };
         AddDelegate(d);
         List<LauchEffect> list = GetNotInChainEffect(targetPlayer);
-        Debug.Log(list.Count);
         HandleNotInChainEffect(list);
     }
 
@@ -3711,4 +3719,11 @@ public class Duel : MonoBehaviour, IDuel
     {
         return attackEvent;
     }
+
+
+    #region 处理延迟动作
+
+    //public void AddDelayAction
+
+    #endregion
 }

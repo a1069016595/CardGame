@@ -46,11 +46,10 @@ public class C27821104 : ICardScripts
     private void GetTarget(IDuel duel, Card card, LauchEffect effect, GroupCardSelectBack dele)
     {
         Group result = GetTarget(duel, card);
-
         GroupCardSelectBack callBack = delegate(Group g)
         {
             card.EffectDataCard = g.GetFirstCard();
-            duel.FinishHandle();
+            dele(g);
         };
 
         duel.SelectCardFromGroup(result, callBack, 1, card.controller);
@@ -77,15 +76,15 @@ public class C27821104 : ICardScripts
 
     public void Operation(IDuel duel, Card card, LauchEffect effect, Group group = null)
     {
-        mCard = card;
         Card target = card.EffectDataCard;
+        mCard = target;
         Group g = duel.GetIncludeNameCardFromArea(ComStr.KeyWord_SixSamurai, false, card.controller, ComVal.cardType_Monster, ComVal.Area_MainDeck, Fiter);
-        if (!card.curArea.IsBind(ComVal.Area_Monster) || g.GroupNum == 0)
+       if (!target.curArea.IsBind(ComVal.Area_Monster) || g.GroupNum == 0)
         {
             duel.FinishHandle();
             return;
         }
-
+      
         GroupCardSelectBack callBack = delegate(Group val)
         {
             normalDele d = delegate
