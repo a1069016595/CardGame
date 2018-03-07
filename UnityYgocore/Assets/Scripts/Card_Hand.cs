@@ -68,7 +68,6 @@ public class Card_Hand : BaseCard, IPointerExitHandler
 
     public override void OnPointerEnter(PointerEventData eventData)
     {
-
         if (isMove)
             return;
         isMove = true;

@@ -262,7 +262,7 @@ public static class ComVal
     public const int cardEffectType_lauchEffect = cardEffectType_mustLauch | cardEffectType_mustToChooseLauch | cardEffectType_chooseLauch
                                                 | cardEffectType_normalLauch;
 
-    public const int cardEffectType_triggerEffect = cardEffectType_mustLauch | cardEffectType_mustToChooseLauch | cardEffectType_chooseLauch;//触发效果
+    public const int cardEffectType_triggerEffect = cardEffectType_mustLauch | cardEffectType_mustToChooseLauch | cardEffectType_chooseLauch | cardEffectType_notInChain;//触发效果
     #endregion
 
     #region 状态效果种类
@@ -429,6 +429,28 @@ public static class ComVal
     /// 用户名
     /// </summary>
     public static string account;
+
+    public static int GetResetCode(int phase)
+    {
+        switch (phase)
+        {
+            case ComVal.Phase_Drawphase:
+                return (ComVal.resetEvent_LeaveDrawPhase);
+            case ComVal.Phase_Standbyphase:
+                return (ComVal.resetEvent_LeaveStandByPhase);
+            case ComVal.Phase_Mainphase1:
+                return (ComVal.resetEvent_LeaveMainPhase1);
+            case ComVal.Phase_Battlephase:
+                return (ComVal.resetEvent_LeaveBattlePhase);
+            case ComVal.Phase_Mainphase2:
+                return (ComVal.resetEvent_LeaveMainPhase2);
+            case ComVal.Phase_Endphase:
+                return (ComVal.resetEvent_LeaveEndPhase);
+            default:
+                break;
+        }
+        return -1;
+    }
 }
 
 public class ComStr

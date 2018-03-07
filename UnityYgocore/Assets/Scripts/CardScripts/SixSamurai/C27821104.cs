@@ -21,36 +21,16 @@ public class C27821104 : ICardScripts
         e1.SetOperation(Operation);
         duel.ResignEffect(e1, card, player);
 
-        LauchEffect e2 = new LauchEffect();
-        e2.SetCardEffectType(ComVal.cardEffectType_mustNotInChain);
-        e2.SetCategory(ComVal.category_destroy);
-        e2.SetCheckLauch(CheckLauch1);
-        e2.SetCode(ComVal.code_EnterEndPhase);
-        e2.SetOperation(Operation1);
-        duel.ResignEffect(e2, card, player);
     }
 
-    private bool CheckLauch1(IDuel duel, Card card, LauchEffect effect, Code code)
-    {
-        Card c = card.EffectDataCard;
-        return c.curArea.IsBind(ComVal.Area_Monster);
-    }
-
-    private void Operation1(IDuel duel, Card card, LauchEffect effect, Group target = null)
-    {
-        Card c = card.EffectDataCard;
-        duel.AddFinishHandle();
-        duel.SendToGraveyard(ComVal.Area_Monster, c.ToGroup(), card, ComVal.reason_Effect, effect);
-    }
 
     private void GetTarget(IDuel duel, Card card, LauchEffect effect, GroupCardSelectBack dele)
     {
         Group result = GetTarget(duel, card);
-
         GroupCardSelectBack callBack = delegate(Group g)
         {
             card.EffectDataCard = g.GetFirstCard();
-            duel.FinishHandle();
+            dele(g);
         };
 
         duel.SelectCardFromGroup(result, callBack, 1, card.controller);
@@ -77,10 +57,10 @@ public class C27821104 : ICardScripts
 
     public void Operation(IDuel duel, Card card, LauchEffect effect, Group group = null)
     {
-        mCard = card;
         Card target = card.EffectDataCard;
+        mCard = target;
         Group g = duel.GetIncludeNameCardFromArea(ComStr.KeyWord_SixSamurai, false, card.controller, ComVal.cardType_Monster, ComVal.Area_MainDeck, Fiter);
-        if (!card.curArea.IsBind(ComVal.Area_Monster) || g.GroupNum == 0)
+        if (!target.curArea.IsBind(ComVal.Area_Monster) || g.GroupNum == 0)
         {
             duel.FinishHandle();
             return;
@@ -90,6 +70,13 @@ public class C27821104 : ICardScripts
         {
             normalDele d = delegate
             {
+                normalDele DestoryCard = delegate
+                {
+                    Card c = val.GetFirstCard();
+                    duel.SendToGraveyard(ComVal.Area_Monster, c.ToGroup(), card, ComVal.reason_Effect, effect);
+                };
+                duel.AddDelayAction(DestoryCard, ComVal.resetEvent_LeaveEndPhase, 0);
+
                 duel.FinishHandle();
             };
             duel.SpeicalSummon(ComVal.Area_MainDeck, val.GetFirstCard(), card.controller, card, ComVal.reason_Effect, effect, 0, d);

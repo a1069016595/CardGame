@@ -796,9 +796,12 @@ public class Card
             }
             if (ComVal.isBind(code.code, item.code))
             {
-                if (isNotInChain && !item.cardEffectType.IsBind(ComVal.cardEffectType_notInChain))
+                if (item.cardEffectType.IsBind(ComVal.cardEffectType_notInChain))
                 {
-                    return false;
+                    if(!isNotInChain)
+                    {
+                        return false;
+                    }
                 }
                 if (item.CanBeLaunch(code) && !chain.ContainEffect(item.code, this, item) && item.IsBindCardEffectType(effectType))
                 {
@@ -1068,7 +1071,13 @@ public class Card
         return 0;
     }
 
+    public List<Pointer> GetPointerList()
+    {
+        return curPointerList;
+    }
+
     #endregion
+
 }
 
 /// <summary>

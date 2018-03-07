@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
-public class Card_Field : BaseCard
+public class Card_Field : BaseCard,IPointerExitHandler
 {
 
     Text AfkText;
@@ -24,8 +24,8 @@ public class Card_Field : BaseCard
 
     private DashedAnim selectAnim;
 
-    public int curArea;
-    public int curRank;
+    private int curArea;
+    private int curRank;
 
     public bool isMy;
 
@@ -238,10 +238,15 @@ public class Card_Field : BaseCard
         return curRank;
     }
 
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        DuelEventSys.GetInstance.SendEvent(DuelEvent.uiEvent_HideFieldCardMes);
+    }
 
     void OnMouseOver()
     {
         DuelEventSys.GetInstance.OnOver_updateSelectCardShow(id);
+        DuelEventSys.GetInstance.SendEvent(DuelEvent.uiEvent_ShowFieldCardMes,isMy, curArea, curRank,  transform.parent.GetComponent<RectTransform>().anchoredPosition);
         if(!Input.GetMouseButtonDown(0))
         {
             return;
@@ -265,9 +270,7 @@ public class Card_Field : BaseCard
             }
         }
 
-        int curArea=(int)GetUIAreaType();
-        int rank = GetCard();
-        optionListUI.ShowOptionList(curArea, rank, rectTransform.position, isMy);
+        optionListUI.ShowOptionList(curArea, curRank, rectTransform.position, isMy);
     }
 
     /// <summary>
@@ -315,4 +318,5 @@ public class Card_Field : BaseCard
     {
         selectAnim.EndSelectState();
     }
+
 }

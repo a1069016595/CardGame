@@ -7,17 +7,15 @@ using UnityEngine.UI;
 using Protocol;
 using System.Linq;
 
-/*
- * 
- *  TODO:增加卡片发动时信息
- *  TODO:龙骑兵团卡组
-*/
+
+
 public delegate void CardDele(Card card);
 public delegate void normalDele();
 public delegate void BoolDele(bool val);
 public delegate bool Filter(Card card);
 //public delegate bool Filter(Card card,Card effectCard);
 public delegate void IntDele(int val);
+
 
 /// <summary>
 /// 处理游戏的逻辑
@@ -97,6 +95,8 @@ public class Duel : MonoBehaviour, IDuel
     public bool IsNetWork = false;
 
     Console console;
+
+    List<DelayAction> duelActionList = new List<DelayAction>();
 
     void Awake()
     {
@@ -371,63 +371,48 @@ public class Duel : MonoBehaviour, IDuel
         int phase = (int)args[0];
         if (isInAnim || !IsFree())
         {
-            console.Log("???");
+            console.Log("切换阶段错误");
             return;
         }
-        switch (currentPhase)
+        normalDele d = delegate
         {
-            case ComVal.Phase_Drawphase:
-                HandleResetEffectList(ComVal.resetEvent_LeaveDrawPhase);
-                break;
-            case ComVal.Phase_Standbyphase:
-                HandleResetEffectList(ComVal.resetEvent_LeaveStandByPhase);
-                break;
-            case ComVal.Phase_Mainphase1:
-                HandleResetEffectList(ComVal.resetEvent_LeaveMainPhase1);
-                break;
-            case ComVal.Phase_Battlephase:
-                HandleResetEffectList(ComVal.resetEvent_LeaveBattlePhase);
-                break;
-            case ComVal.Phase_Mainphase2:
-                HandleResetEffectList(ComVal.resetEvent_LeaveMainPhase2);
-                break;
-            case ComVal.Phase_Endphase:
-                HandleResetEffectList(ComVal.resetEvent_LeaveEndPhase);
-                break;
-            default:
-                break;
-        }
-        currentPhase = phase;
-        if (ComVal.isBind(currentPhase, ComVal.Phase_Drawphase))
-        {
-            EnterDrawPhase();
-        }
-        else if (ComVal.isBind(currentPhase, ComVal.Phase_Standbyphase))
-        {
-            EnterStandbyphase();
-        }
-        else if (ComVal.isBind(currentPhase, ComVal.Phase_Mainphase1))
-        {
-            EnterMainPhase();
-        }
-        else if (ComVal.isBind(currentPhase, ComVal.Phase_Battlephase))
-        {
-            EnterBattlePhase();
-        }
-        else if (ComVal.isBind(currentPhase, ComVal.Phase_Mainphase2))
-        {
-            EnterMainPhase2();
-        }
-        else if (ComVal.isBind(currentPhase, ComVal.Phase_Endphase))
-        {
-            EnterEndPhase();
-        }
-        else
-        {
-            console.Log("error");
-        }
-        duelUIManager.ChangeToPhase(phase);
-        UpdateCardMesShow();
+            currentPhase = phase;
+            if (ComVal.isBind(currentPhase, ComVal.Phase_Drawphase))
+            {
+                EnterDrawPhase();
+            }
+            else if (ComVal.isBind(currentPhase, ComVal.Phase_Standbyphase))
+            {
+                EnterStandbyphase();
+            }
+            else if (ComVal.isBind(currentPhase, ComVal.Phase_Mainphase1))
+            {
+                EnterMainPhase();
+            }
+            else if (ComVal.isBind(currentPhase, ComVal.Phase_Battlephase))
+            {
+                EnterBattlePhase();
+            }
+            else if (ComVal.isBind(currentPhase, ComVal.Phase_Mainphase2))
+            {
+                EnterMainPhase2();
+            }
+            else if (ComVal.isBind(currentPhase, ComVal.Phase_Endphase))
+            {
+                EnterEndPhase();
+            }
+            else
+            {
+                console.Log("error");
+            }
+            duelUIManager.ChangeToPhase(phase);
+            UpdateCardMesShow();
+        };
+        AddDelegate(d, true);
+
+        int resetCode = ComVal.GetResetCode(currentPhase);
+        HandleResetEffectList(resetCode);
+        HandleDelayAction(resetCode);
     }
 
     private void ChangeRound()
@@ -619,7 +604,7 @@ public class Duel : MonoBehaviour, IDuel
             Debug.Log(str);
             throw;
         }
-      
+
     }
 
 
@@ -661,7 +646,7 @@ public class Duel : MonoBehaviour, IDuel
                 console.Log("error");
             }
         }
-        else if(effect.IsBindType(EffectType.EquipEffect))
+        else if (effect.IsBindType(EffectType.EquipEffect))
         {
 
         }
@@ -733,7 +718,7 @@ public class Duel : MonoBehaviour, IDuel
             console.Log("主卡组没卡");
             return;
         }
-        if(num==0)
+        if (num == 0)
         {
             FinishHandle();
             return;
@@ -755,7 +740,7 @@ public class Duel : MonoBehaviour, IDuel
             {
                 if (reasonCard != null)
                 {
-                    CreateCode(null, player, ComVal.code_DrawCard, reasonCard, 0, reasonEffect,true);
+                    CreateCode(null, player, ComVal.code_DrawCard, reasonCard, 0, reasonEffect, true);
                 }
                 else
                 {
@@ -763,7 +748,7 @@ public class Duel : MonoBehaviour, IDuel
                 }
                 return;
             }
-            DrawCard(player, num - 1,reasonCard,reasonEffect);
+            DrawCard(player, num - 1, reasonCard, reasonEffect);
         };
         duelUIManager.ShowDrawAnim(card.cardID, dele, player.group_HandCard.GroupNum, player.isMy);
     }
@@ -813,12 +798,12 @@ public class Duel : MonoBehaviour, IDuel
             FinishHandle();
         };
         AddDelegate(d1);
-        AddCardToHand(g.ToList(),r);
+        AddCardToHand(g.ToList(), r);
     }
 
     public void AddCardToHandFromArea(int area, Card c, Player player, Card card, LauchEffect effect)
     {
-        if(area.IsBind(ComVal.Area_MainDeck))
+        if (area.IsBind(ComVal.Area_MainDeck))
         {
             AddCardToHandFromMainDeck(c, player, card, effect);
         }
@@ -828,7 +813,7 @@ public class Duel : MonoBehaviour, IDuel
         }
     }
 
-    private void AddCardToHand(List<Card> cardList,Reason r)
+    private void AddCardToHand(List<Card> cardList, Reason r)
     {
         Card c = cardList[0];
         cardList.RemoveAt(0);
@@ -923,7 +908,7 @@ public class Duel : MonoBehaviour, IDuel
         card.curPlaseState = ComVal.CardPutType_UpRightFront;
         card.cardChangeTypeedTime++;
         card.cardChangeTypeTime--;
-        Group group = new Group(); 
+        Group group = new Group();
         group.AddAndSetCard(card);
         CreateCode(group, player, ComVal.code_TurnBackSummon, reasonCard, 0, reasonEffect);
     }
@@ -1054,7 +1039,7 @@ public class Duel : MonoBehaviour, IDuel
     /// <param name="reasonCard"></param>
     /// <param name="theReason"></param>
     /// <param name="effect"></param>
-    public void SendToRemove(List< int> area, Group group, Card reasonCard, int theReason, BaseEffect effect)
+    public void SendToRemove(List<int> area, Group group, Card reasonCard, int theReason, BaseEffect effect)
     {
         group = group.SiftingGroupInArea(area);
         if (group.GroupNum == 0)
@@ -1087,7 +1072,7 @@ public class Duel : MonoBehaviour, IDuel
         {
             areaList.Add(area);
         }
-        SendToRemove(areaList,group,reasonCard,theReason,effect);
+        SendToRemove(areaList, group, reasonCard, theReason, effect);
     }
 
     /// <summary>
@@ -1132,7 +1117,7 @@ public class Duel : MonoBehaviour, IDuel
         Duel_ChangeCardArea.RemoveCardFromArea(c, c.ownerPlayer, 0);
     }
 
-    public void SendToMainDeck(int fromArea,Group g,Card reasonCard,int theReason,BaseEffect effect)
+    public void SendToMainDeck(int fromArea, Group g, Card reasonCard, int theReason, BaseEffect effect)
     {
         g = g.SiftingGroupInArea(fromArea);
         if (g.GroupNum == 0)
@@ -1174,7 +1159,7 @@ public class Duel : MonoBehaviour, IDuel
             };
             AddDelegate(d2, true);
             CardLeaveAreaCheck(c);
-          
+
         };
         AddDelegate(d);
         console.Log(c.curArea);
@@ -1208,7 +1193,7 @@ public class Duel : MonoBehaviour, IDuel
             };
             AddDelegate(d1, true);
             CardLeaveAreaCheck(c);
-          
+
         };
         AddDelegate(d);
         duelUIManager.ShowChangeAreaAnim(c.cardID, c.curArea, ComVal.Area_Remove, c.curPlaseState, -1, c.controller.isMy, c.areaRank);
@@ -1242,7 +1227,7 @@ public class Duel : MonoBehaviour, IDuel
     /// 将卡片返回手牌
     /// <para></para>
     /// </summary>
-    private void SendCardToHand(Group g, Reason r,Player p)
+    private void SendCardToHand(Group g, Reason r, Player p)
     {
         Card c = g.GetCard(0);
         g.RemoveCard(c);
@@ -1263,7 +1248,7 @@ public class Duel : MonoBehaviour, IDuel
             }
             else
             {
-                SendCardToHand(g, r,p);
+                SendCardToHand(g, r, p);
             }
         };
         AddDelegate(d);
@@ -1299,9 +1284,9 @@ public class Duel : MonoBehaviour, IDuel
     /// <summary>
     /// 装备卡
     /// </summary>
-    public void EquipCardFromArea(int area,Card equipCard,Player targetPlayer, Card reasonCard,BaseEffect e)
+    public void EquipCardFromArea(int area, Card equipCard, Player targetPlayer, Card reasonCard, BaseEffect e)
     {
-        if(!equipCard.curArea.IsBind(area)||targetPlayer.GetLeftTrapAreaNum()==0)
+        if (!equipCard.curArea.IsBind(area) || targetPlayer.GetLeftTrapAreaNum() == 0)
         {
             FinishHandle();
             return;
@@ -1313,7 +1298,7 @@ public class Duel : MonoBehaviour, IDuel
             FinishHandle();
         };
         AddDelegate(d);
-        int rank=duelUIManager.GetAreaRank(false,targetPlayer.isMy);
+        int rank = duelUIManager.GetAreaRank(false, targetPlayer.isMy);
         duelUIManager.ShowChangeAreaAnim(equipCard.cardID, equipCard.curArea, ComVal.Area_NormalTrap, equipCard.curPlaseState,
                                             ComVal.CardPutType_UpRightFront, targetPlayer.isMy, equipCard.areaRank, rank);
         Duel_ChangeCardArea.RemoveCardFromArea(equipCard, equipCard.controller, equipCard.curArea);
@@ -1324,7 +1309,7 @@ public class Duel : MonoBehaviour, IDuel
         for (int i = 0; i < g.GroupNum; i++)
         {
             Card c = g[i];
-           
+
             c.SetArea(ComVal.Area_Graveyard, null);
         }
 
@@ -1423,6 +1408,64 @@ public class Duel : MonoBehaviour, IDuel
 
     #region 召唤
 
+    public void SpeicalSummon(int area, Group g, Player player, Card reasonCard, int reason, BaseEffect reasonEffect, int putType, normalDele theDele = null)
+    {
+        Reason r = new Reason(reason, reasonCard, reasonEffect);
+        SpeicalSummon(area, g.ToList(), player, putType, r);
+    }
+
+    private void SpeicalSummon(int area, List<Card> cardList, Player player, int putType,Reason r)
+    {
+        if (cardList.Count == 0)
+        {
+            FinishHandle();
+        }
+        else
+        {
+            Card c = cardList[0];
+            cardList.RemoveAt(0);
+            if (area != c.curArea || player.GetLeftMonsterAreaNum() == 0)
+            {
+                SpeicalSummon(area, cardList, player, putType,r);
+            }
+            else
+            {
+                IntDele spSummon = delegate(int mPutType)
+                {
+                    normalDele d3 = delegate
+                    {
+                        Duel_ChangeCardArea.AddCardToArea(ComVal.Area_Monster, c, player, r, mPutType);
+                    };
+                    AddDelegate(d3, "jj");
+                    int toRank = duelUIManager.GetAreaRank(true, player.isMy);
+                    duelUIManager.ShowChangeAreaAnim(c.cardID, c.curArea, ComVal.Area_Monster, -1, mPutType, player.isMy, c.areaRank, toRank);
+                    Duel_ChangeCardArea.RemoveCardFromArea(c, player, 0);
+                };
+                if (putType == 0)
+                {
+                    BoolDele dele = delegate(bool val)
+                    {
+                        int cardPutType;
+                        if (val)
+                        {
+                            cardPutType = ComVal.CardPutType_UpRightFront;
+                        }
+                        else
+                        {
+                            cardPutType = ComVal.CardPutType_layFront;
+                        }
+                        spSummon(cardPutType);
+                    };
+                    duelUIManager.ShowSelectPutType(c.cardID, dele, player.isMy);
+                }
+                else
+                {
+                    spSummon(putType);
+                }
+            }
+        }
+    }
+
     /// <summary>
     /// 特殊召唤 TODO:召唤宣言时点
     /// <para>当卡片不在指定区域时，不会特殊召唤</para>
@@ -1431,7 +1474,7 @@ public class Duel : MonoBehaviour, IDuel
     /// </summary>
     public void SpeicalSummon(int area, Card card, Player player, Card reasonCard, int reason, BaseEffect reasonEffect, int putType, normalDele theDele = null)
     {
-        if (area != card.curArea||player.GetLeftMonsterAreaNum()==0)
+        if (area != card.curArea || player.GetLeftMonsterAreaNum() == 0)
         {
             if (theDele != null)
                 theDele();
@@ -1503,11 +1546,11 @@ public class Duel : MonoBehaviour, IDuel
     /// <summary>
     /// 无效召唤
     /// </summary>
-    public void NegateSummon(Card c,BaseEffect e)
+    public void NegateSummon(Card c, BaseEffect e)
     {
-        if(spSummonEvent!=null)
+        if (spSummonEvent != null)
         {
-            spSummonEvent.SetInvalid(c,e);
+            spSummonEvent.SetInvalid(c, e);
         }
     }
 
@@ -1601,7 +1644,7 @@ public class Duel : MonoBehaviour, IDuel
         normalDele d1 = delegate
         {
             Duel_ChangeCardArea.AddCardToArea(ComVal.Area_Monster, card, player, r, putType);
-            if(isSet)
+            if (isSet)
             {
                 isInAnim = false;
                 return;
@@ -1629,7 +1672,7 @@ public class Duel : MonoBehaviour, IDuel
             card.SetCardSetRound();
         };
         AddDelegate(d);
-        int rank= duelUIManager.GetAreaRank(false, player.isMy);
+        int rank = duelUIManager.GetAreaRank(false, player.isMy);
         duelUIManager.ShowChangeAreaAnim(card.cardID, ComVal.Area_Hand, ComVal.Area_NormalTrap, -1, ComVal.CardPutType_UpRightBack, player.isMy, card.areaRank, rank);
         Duel_ChangeCardArea.RemoveCardFromArea(card, player, 0);
     }
@@ -1673,7 +1716,7 @@ public class Duel : MonoBehaviour, IDuel
             console.Log("发动在墓地的魔法卡");
             FinishHandle();
         }
-        else if(area==ComVal.Area_FieldSpell)
+        else if (area == ComVal.Area_FieldSpell)
         {
             console.Log("发动地形卡效果");
             FinishHandle();
@@ -1681,7 +1724,7 @@ public class Duel : MonoBehaviour, IDuel
         else
         {
             console.Log("error");
-            
+
         }
     }
 
@@ -1729,7 +1772,7 @@ public class Duel : MonoBehaviour, IDuel
         }
         else if (area == ComVal.Area_FieldSpell)
         {
-            Card card = player.fieldSpell;
+            Card card = player.GetCard(area, rank);
             return GetTrapOption(card);
         }
         else if (area == ComVal.Area_MainDeck)
@@ -1751,6 +1794,12 @@ public class Duel : MonoBehaviour, IDuel
         return optionList;
     }
 
+    public Card GetCard(bool isMy, int area, int rank)
+    {
+        Player player = GetPlayer(isMy);
+        Card card = player.GetCard(area, rank);
+        return card;
+    }
 
     #region 获取选项
 
@@ -1782,7 +1831,7 @@ public class Duel : MonoBehaviour, IDuel
             {
                 list.Add(ComStr.Operate_Attack);
             }
-            if(card.cardType.IsBind(ComVal.CardType_Monster_XYZ)&&card.materialsXYZCardList.Count>0)
+            if (card.cardType.IsBind(ComVal.CardType_Monster_XYZ) && card.materialsXYZCardList.Count > 0)
             {
                 list.Add(ComStr.Operate_CheckList);
             }
@@ -1982,10 +2031,10 @@ public class Duel : MonoBehaviour, IDuel
                 Operate_LauchEffect(area, rank, isMy);
                 break;
             case ComStr.Operate_CheckList:
-                Operate_CheckList(area,rank, isMy);
+                Operate_CheckList(area, rank, isMy);
                 break;
             case ComStr.Operate_SpecialSummon:
-                if(area.IsBind(ComVal.Area_Extra))
+                if (area.IsBind(ComVal.Area_Extra))
                 {
                     Operate_SpSummonFromExtra(GetPlayer(isMy));
                 }
@@ -2317,11 +2366,11 @@ public class Duel : MonoBehaviour, IDuel
     void Operate_NormalSummon(int area, int rank, bool isMy)
     {
         Card card = GetPlayer(isMy).GetCard(area, rank);
-     //   SacrificeSummon(card, card.ownerPlayer, false, card.GetSacrificeNum());
+        //   SacrificeSummon(card, card.ownerPlayer, false, card.GetSacrificeNum());
         NormalSummon(card, card.ownerPlayer, false, false);
     }
 
-    void Operate_CheckList(int area,int rank, bool isMy)
+    void Operate_CheckList(int area, int rank, bool isMy)
     {
         Group group = new Group();
         switch (area)
@@ -2337,9 +2386,9 @@ public class Duel : MonoBehaviour, IDuel
                 break;
             case ComVal.Area_Monster:
                 Card c = GetPlayer(isMy).GetCard(area, rank);
-                if(!c.cardType.IsBind(ComVal.CardType_Monster_XYZ)||c.materialsXYZCardList.Count==0)
+                if (!c.cardType.IsBind(ComVal.CardType_Monster_XYZ) || c.materialsXYZCardList.Count == 0)
                 {
-                    Debug.Log("error  "+ c.cardID);
+                    Debug.Log("error  " + c.cardID);
                     return;
                 }
                 else
@@ -2353,7 +2402,7 @@ public class Duel : MonoBehaviour, IDuel
         {
             IsSelect = false;
         };
-        duelUIManager.ShowSelectCardUI(group, dele, 0, true,false);
+        duelUIManager.ShowSelectCardUI(group, dele, 0, true, false);
         IsSelect = true;
     }
 
@@ -2402,7 +2451,7 @@ public class Duel : MonoBehaviour, IDuel
                         p.group_MonsterCard.RemoveCard(m.cardList[i].areaRank);
                         m.cardList[i].SetArea(ComVal.Area_XYZMaterial, null);
                     }
-                    SpeicalSummon(ComVal.Area_Extra, spSummonCard, p, spSummonCard, ComVal.reason_SynchroSummon, null, 0,d);
+                    SpeicalSummon(ComVal.Area_Extra, spSummonCard, p, spSummonCard, ComVal.reason_SynchroSummon, null, 0, d);
                 };
                 SelectXYZMaterial(selectMaterial, spSummonCard, p);
             }
@@ -2515,7 +2564,7 @@ public class Duel : MonoBehaviour, IDuel
     {
         Group g = p.group_MonsterCard.GetGroup().GetFitlerGroup(xyzCard.xyzFilter);
         Group result = new Group();
-        SelectXYZMaterial(result, g, dele,  p,xyzCard.xyzMaterialNum);
+        SelectXYZMaterial(result, g, dele, p, xyzCard.xyzMaterialNum);
     }
 
     private void SelectXYZMaterial(Group result, Group selectGroup, GroupCardSelectBack dele, Player p, int selectNum)
@@ -2536,7 +2585,7 @@ public class Duel : MonoBehaviour, IDuel
         };
         SelectCardFromGroup(selectGroup, callBack, 1, p);
     }
-    
+
     /// <summary>
     /// 跟新卡片的场上信息和攻击动画 TODO:显示对方场上的攻击动画
     /// </summary>
@@ -2684,7 +2733,7 @@ public class Duel : MonoBehaviour, IDuel
                     d();
                 }
             };
-            if(effect.cardEffectType.IsBind(ComVal.cardEffectType_mustNotInChain))
+            if (effect.cardEffectType.IsBind(ComVal.cardEffectType_mustNotInChain))
             {
                 callBack(true);
             }
@@ -2839,7 +2888,7 @@ public class Duel : MonoBehaviour, IDuel
         List<int> handCardList = new List<int>();
         List<int> monsterCardList = new List<int>();
         List<int> trapCardList = new List<int>();
-        List<int> fieldSpellList=new List<int>();
+        List<int> fieldSpellList = new List<int>();
         foreach (var item in list)
         {
             if (ComVal.isBind(item.curArea, ComVal.Area_Hand))
@@ -2854,7 +2903,7 @@ public class Duel : MonoBehaviour, IDuel
             {
                 trapCardList.Add(item.areaRank);
             }
-            else if(item.curArea.IsBind(ComVal.Area_FieldSpell))
+            else if (item.curArea.IsBind(ComVal.Area_FieldSpell))
             {
                 fieldSpellList.Add(0);
             }
@@ -2878,14 +2927,14 @@ public class Duel : MonoBehaviour, IDuel
     /// <summary>
     /// 检测当前时点可发动的效果,并将其加入列表之中
     /// </summary>
-    List<Card> CheckCanLauchEffect(Player player, Code code, bool isTrigger,bool isNotInChain=false)
+    List<Card> CheckCanLauchEffect(Player player, Code code, bool isTrigger, bool isNotInChain = false)
     {
         List<Card> result = new List<Card>();
         foreach (var item in player.group_TrapCard.cardList)
         {
             if (item != null)
             {
-                if (item.CanLauchTriggerEffect(code, curChain, isTrigger,isNotInChain))
+                if (item.CanLauchTriggerEffect(code, curChain, isTrigger, isNotInChain))
                 {
                     result.Add(item);
                 }
@@ -2895,7 +2944,7 @@ public class Duel : MonoBehaviour, IDuel
         {
             if (item != null)
             {
-                if (item.CanLauchTriggerEffect(code, curChain, isTrigger,isNotInChain))
+                if (item.CanLauchTriggerEffect(code, curChain, isTrigger, isNotInChain))
                 {
                     result.Add(item);
                 }
@@ -2941,7 +2990,7 @@ public class Duel : MonoBehaviour, IDuel
                 }
             }
         }
-        if(player.fieldSpell!=null)
+        if (player.fieldSpell != null)
         {
             if (player.fieldSpell.CanLauchTriggerEffect(code, curChain, isTrigger, isNotInChain))
             {
@@ -3136,9 +3185,9 @@ public class Duel : MonoBehaviour, IDuel
                   OperateChain();
               };
                 AddDelegate(a, "处理连锁");
-                
+
                 LauchEffect effect = curChain.GetEffect();
-                if(curChain.IsEffectDisable(effect))
+                if (curChain.IsEffectDisable(effect))
                 {
                     curChain.RemoveEffect();
                     duelEventSys.UpdateUI_ChainUI(curChain);
@@ -3312,7 +3361,7 @@ public class Duel : MonoBehaviour, IDuel
 
     public bool IsPlayerRound(Player p)
     {
-        return curPlayer==p;
+        return curPlayer == p;
     }
 
     public int GetCurPhase()
@@ -3498,15 +3547,15 @@ public class Duel : MonoBehaviour, IDuel
         return list;
     }
 
-    public void AddDelegate(normalDele dele,bool isAction=false)
+    public void AddDelegate(normalDele dele, bool isAction = false)
     {
-        AddDelegate(dele, null,isAction);
+        AddDelegate(dele, null, isAction);
     }
 
-    public void AddDelegate(normalDele dele, string mes,bool isAction=false)
+    public void AddDelegate(normalDele dele, string mes, bool isAction = false)
     {
         console.Log("增加回调   " + mes);
-        DuelDele duelDele = new DuelDele(dele, mes,isAction);
+        DuelDele duelDele = new DuelDele(dele, mes, isAction);
         delegateStack.Push(duelDele);
     }
 
@@ -3523,7 +3572,7 @@ public class Duel : MonoBehaviour, IDuel
     {
         foreach (var item in delegateStack)
         {
-            if(item.IsAction)
+            if (item.IsAction)
             {
                 return true;
             }
@@ -3656,7 +3705,7 @@ public class Duel : MonoBehaviour, IDuel
         return g;
     }
 
-    public void ShowDialogBox(Card c, GetMes dele,bool isMy)
+    public void ShowDialogBox(Card c, GetMes dele, bool isMy)
     {
         string val = "是否发动[" + c.cardName + "]的效果";
         duelUIManager.ShowDialogBoxUI(val, dele, isMy);
@@ -3710,4 +3759,53 @@ public class Duel : MonoBehaviour, IDuel
     {
         return attackEvent;
     }
+
+
+    #region 处理延迟动作
+
+    public void AddDelayAction(normalDele dele, int code, int lauchPhaseCount)
+    {
+        DelayAction delayAction = new DelayAction(dele, code, lauchPhaseCount);
+        delayAction.startRound = roundCount;
+        duelActionList.Add(delayAction);
+    }
+
+    public void HandleDelayAction(int resetCode)
+    {
+        DelayAction result = null;
+        for (int i = 0; i < duelActionList.Count; i++)
+        {
+            DelayAction item = duelActionList[i];
+            int lauchRoundCount = item.startRound + item.lauchRoundCount;
+            if (lauchRoundCount == roundCount)
+            {
+                if (item.lauchCode == resetCode)
+                {
+                    result = item;
+                    duelActionList.RemoveAt(i);
+                    break;
+                }
+            }
+            else if (lauchRoundCount > roundCount)
+            {
+                duelActionList.RemoveAt(i);
+                i--;
+            }
+        }
+        if (result == null)
+        {
+            FinishHandle();
+        }
+        else
+        {
+            normalDele d = delegate
+            {
+                HandleDelayAction(resetCode);
+            };
+            AddDelegate(d, true);
+            result.action();
+        }
+    }
+
+    #endregion
 }

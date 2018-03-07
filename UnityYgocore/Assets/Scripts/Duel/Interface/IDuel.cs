@@ -172,5 +172,7 @@ public interface IDuel
     void NegateSummon(Card c, BaseEffect e);
 
     void EquipCardFromArea(int area, Card equipCard, Player targetPlayer, Card reasonCard, BaseEffect e);
+
+    void AddDelayAction(normalDele dele, int code, int lauchPhaseCount);
 }
 
