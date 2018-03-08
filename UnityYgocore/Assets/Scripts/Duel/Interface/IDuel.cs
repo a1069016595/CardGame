@@ -174,5 +174,7 @@ public interface IDuel
     void EquipCardFromArea(int area, Card equipCard, Player targetPlayer, Card reasonCard, BaseEffect e);
 
     void AddDelayAction(normalDele dele, int code, int lauchPhaseCount);
+
+    void SpeicalSummon(int area, Group g, Player player, Card reasonCard, int reason, BaseEffect reasonEffect, int putType, GroupCardSelectBack theDele = null);
 }
 

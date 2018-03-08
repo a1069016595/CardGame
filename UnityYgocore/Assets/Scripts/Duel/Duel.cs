@@ -1408,17 +1408,48 @@ public class Duel : MonoBehaviour, IDuel
 
     #region 召唤
 
-    public void SpeicalSummon(int area, Group g, Player player, Card reasonCard, int reason, BaseEffect reasonEffect, int putType, normalDele theDele = null)
+    public void SpeicalSummon(int area, Group g, Player player, Card reasonCard, int reason, BaseEffect reasonEffect, int putType, GroupCardSelectBack theDele = null)
     {
+        Group result = new Group();
+        normalDele d = delegate
+        {
+            normalDele d1 = delegate
+            {
+                if (spSummonEvent.IsInvalid)
+                {
+                    if (theDele != null)
+                    {
+                        normalDele d3 = delegate
+                        {
+                            theDele(new Group());
+                        };
+                        AddDelegate(d3);
+                    }
+                    Group theGroup = spSummonEvent.spSummonGroup;
+                    SendToGraveyard(ComVal.Area_Monster, theGroup, spSummonEvent.invalidReasonCard, ComVal.reason_InviadSpSummon, spSummonEvent.invalidReasonEffect);
+                    return;
+                }
+                else
+                {
+                    if (theDele != null)
+                        theDele(result);
+                    CreateCode(g, player, ComVal.code_SpecialSummon, reasonCard, reason, reasonEffect);
+                }
+            };
+            AddDelegate(d1);
+            CreateCode(g, player, ComVal.code_SpDeclaration, reasonCard, 0, reasonEffect, true);
+        };
+        AddDelegate(d);
         Reason r = new Reason(reason, reasonCard, reasonEffect);
-        SpeicalSummon(area, g.ToList(), player, putType, r);
+        SpeicalSummon(area, g.ToList(), player, putType, r,result);
     }
 
-    private void SpeicalSummon(int area, List<Card> cardList, Player player, int putType,Reason r)
+    private void SpeicalSummon(int area, List<Card> cardList, Player player, int putType,Reason r,Group resultGroup)
     {
         if (cardList.Count == 0)
         {
             FinishHandle();
+            return ;
         }
         else
         {
@@ -1426,15 +1457,17 @@ public class Duel : MonoBehaviour, IDuel
             cardList.RemoveAt(0);
             if (area != c.curArea || player.GetLeftMonsterAreaNum() == 0)
             {
-                SpeicalSummon(area, cardList, player, putType,r);
+                SpeicalSummon(area, cardList, player, putType,r,resultGroup);
             }
             else
             {
+                resultGroup.AddCard(c);
                 IntDele spSummon = delegate(int mPutType)
                 {
                     normalDele d3 = delegate
                     {
                         Duel_ChangeCardArea.AddCardToArea(ComVal.Area_Monster, c, player, r, mPutType);
+                        SpeicalSummon(area, cardList, player, putType, r,resultGroup);
                     };
                     AddDelegate(d3, "jj");
                     int toRank = duelUIManager.GetAreaRank(true, player.isMy);
@@ -2507,7 +2540,7 @@ public class Duel : MonoBehaviour, IDuel
     }
 
     /// <summary>
-    /// TODO:待测试
+    /// 
     /// </summary>
     /// <param name="group"></param>
     /// <param name="dele"></param>

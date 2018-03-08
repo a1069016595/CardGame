@@ -103,6 +103,7 @@ public class Card
     List<EffectLauchCountLimit> effectLauchCountLimitList = new List<EffectLauchCountLimit>();
 
     public Card EffectDataCard;
+    public Group EffectDataGroup;
 
     List<Pointer> curPointerList=new List<Pointer>();
 
