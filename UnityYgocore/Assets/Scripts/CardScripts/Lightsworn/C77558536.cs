@@ -63,7 +63,7 @@ public class C77558536 : ICardScripts
                 e1.SetStateEffectType(ComVal.stateEffectType_addAfkVal);
                 e1.SetTarget(card);
                 e1.SetStateEffectVal(200);
-                e1.SetResetCode(ComVal.resetEvent_LeaveEndPhase, 2);
+                e1.SetResetCode(ComVal.resetEvent_LeaveEndPhase, 1);
                 duel.ResignEffect(e1, card, card.controller);
             }
             duel.FinishHandle();

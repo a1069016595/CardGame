@@ -76,7 +76,6 @@ public class C27821104 : ICardScripts
                     duel.SendToGraveyard(ComVal.Area_Monster, c.ToGroup(), card, ComVal.reason_Effect, effect);
                 };
                 duel.AddDelayAction(DestoryCard, ComVal.resetEvent_LeaveEndPhase, 0);
-
                 duel.FinishHandle();
             };
             duel.SpeicalSummon(ComVal.Area_MainDeck, val.GetFirstCard(), card.controller, card, ComVal.reason_Effect, effect, 0, d);

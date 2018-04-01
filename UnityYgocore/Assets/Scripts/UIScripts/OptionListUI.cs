@@ -62,6 +62,7 @@ public class OptionListUI : DuelUIOpearate, IDeselectHandler,IPointerExitHandler
     /// <param name="rank">顺序</param>
     public void ShowOptionList(int area, int rank, Vector3 pos, bool isMy)
     {
+        gameObject.SetActive(true);
         targetArea = area;
         targetRank = rank;
         List<string> list = new List<string>();
@@ -99,6 +100,7 @@ public class OptionListUI : DuelUIOpearate, IDeselectHandler,IPointerExitHandler
         {
             buttonList[i].SetActive(false);
         }
+        gameObject.SetActive(false);
     }
 
     public void OnDeselect(BaseEventData eventData)

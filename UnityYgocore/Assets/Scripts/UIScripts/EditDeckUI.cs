@@ -69,7 +69,6 @@ public class EditDeckUI : MonoBehaviour
         Group extraGroup = curDeck.extraDeck;
         for (int i = 0; i < mainGroup.cardList.Count; i++)
         {
-
             Card theCard = mainGroup.cardList[i];
 
             if (i < mainDeckList.Count)
@@ -114,14 +113,16 @@ public class EditDeckUI : MonoBehaviour
         {
             for (int i = mainGroup.cardList.Count; i < mainDeckList.Count; i++)
             {
-                mainDeckList[i].SetActive(false);
+                RemoveAtMainDeck(i);
+                i--;
             }
         }
         if (extraDeckList.Count > extraGroup.cardList.Count)
         {
             for (int i = extraGroup.cardList.Count; i < extraDeckList.Count; i++)
             {
-                extraDeckList[i].SetActive(false);
+                RemoveAtExtraDeck(i);
+                i--;
             }
         }
         UpdateText();
@@ -134,7 +135,6 @@ public class EditDeckUI : MonoBehaviour
     /// <param name="id">卡片id</param>
     public void AddCardToDeck(string id)
     {
-
         Card card = LoadXml.GetCard(id);
         bool isMain = !ComVal.isInExtra(card.cardType);
 
@@ -168,7 +168,7 @@ public class EditDeckUI : MonoBehaviour
             if (curCard != null)
             {
                 int val = GetObjVal(curCard.gameObject, isMain);
-                AddToDeckFromPool(card, mainDeckGroup.transform,true);
+                AddToDeckFromPool(card, mainDeckGroup.transform, true);
                 curDeck.mainDeck.InsertCard(card, val);
                 for (int i = val; i < curDeck.mainDeck.GroupNum; i++)
                 {
@@ -186,7 +186,7 @@ public class EditDeckUI : MonoBehaviour
             }
             else if (mainDeckList.Count == curDeck.mainDeck.cardList.Count)
             {
-                AddToDeckFromPool(card, mainDeckGroup.transform,true);
+                AddToDeckFromPool(card, mainDeckGroup.transform, true);
             }
             else
             {
@@ -199,8 +199,8 @@ public class EditDeckUI : MonoBehaviour
         {
             if (curCard != null)
             {
-               int val = GetObjVal(curCard.gameObject, isMain);
-                AddToDeckFromPool(card, extraDeckGroup.transform,false);
+                int val = GetObjVal(curCard.gameObject, isMain);
+                AddToDeckFromPool(card, extraDeckGroup.transform, false);
                 curDeck.extraDeck.InsertCard(card, val);
                 for (int i = val; i < curDeck.extraDeck.GroupNum; i++)
                 {
@@ -217,7 +217,7 @@ public class EditDeckUI : MonoBehaviour
             }
             else if (extraDeckList.Count == curDeck.extraDeck.cardList.Count)
             {
-                AddToDeckFromPool(card, extraDeckGroup.transform,false);
+                AddToDeckFromPool(card, extraDeckGroup.transform, false);
             }
             else
             {
@@ -228,7 +228,7 @@ public class EditDeckUI : MonoBehaviour
         UpdateText();
     }
 
-    private void AddToDeckFromPool(Card card, Transform target,bool isMain)
+    private void AddToDeckFromPool(Card card, Transform target, bool isMain)
     {
         if (waitToUseList.Count == 0)
         {
@@ -281,6 +281,7 @@ public class EditDeckUI : MonoBehaviour
     /// </summary>
     public void RemoveCard(GameObject obj)
     {
+        Debug.Log(obj.activeSelf);
         if (mainDeckList.Contains(obj))
         {
             for (int i = 0; i < mainDeckList.Count; i++)
@@ -288,6 +289,7 @@ public class EditDeckUI : MonoBehaviour
                 if (mainDeckList[i] == obj)
                 {
                     mainDeckList.RemoveAt(i);
+                    Debug.Log(curDeck.mainDeck.GroupNum + "  " + i);
                     curDeck.mainDeck.RemoveCard(i);
                     break;
                 }
@@ -340,5 +342,19 @@ public class EditDeckUI : MonoBehaviour
     {
         mainDeckText.text = "主卡组:" + curDeck.mainDeck.GroupNum.ToString();
         extraDeckText.text = "额外卡组:" + curDeck.extraDeck.GroupNum.ToString();
+    }
+
+    private void RemoveAtMainDeck(int i)
+    {
+        GameObject obj = mainDeckList[i];
+        mainDeckList.RemoveAt(i);
+        GameObject.Destroy(obj);
+    }
+
+    private void RemoveAtExtraDeck(int i)
+    {
+        GameObject obj = extraDeckList[i];
+        extraDeckList.RemoveAt(i);
+        GameObject.Destroy(obj);
     }
 }

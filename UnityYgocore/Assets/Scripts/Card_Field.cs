@@ -243,6 +243,11 @@ public class Card_Field : BaseCard,IPointerExitHandler
         DuelEventSys.GetInstance.SendEvent(DuelEvent.uiEvent_HideFieldCardMes);
     }
 
+    void OnMouseExit()
+    {
+        DuelEventSys.GetInstance.SendEvent(DuelEvent.uiEvent_HideFieldCardMes);
+    }
+
     void OnMouseOver()
     {
         DuelEventSys.GetInstance.OnOver_updateSelectCardShow(id);

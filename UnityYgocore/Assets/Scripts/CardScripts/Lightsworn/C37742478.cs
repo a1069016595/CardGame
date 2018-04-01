@@ -55,7 +55,7 @@ public class C37742478 : ICardScripts
         e1.SetCardEffectType(ComVal.cardEffectType_Single | ComVal.cardEffectType_normalStateEffect);
         e1.SetStateEffectType(ComVal.stateEffectType_addAfkVal);
 
-        if (e.Attacker.controller.isMy)
+        if (e.Attacker.controller==card.controller)
         {
             e1.SetTarget(e.Attacker);
             e1.SetStateEffectVal(e.Attackeder.GetCurAfk());
@@ -66,7 +66,7 @@ public class C37742478 : ICardScripts
             e1.SetStateEffectVal(e.Attacker.GetCurAfk());
         }
 
-        e1.SetResetCode(ComVal.resetEvent_LeaveEndPhase, 1);
+        e1.SetResetCode(ComVal.resetEvent_LeaveEndPhase, 0);
         duel.ResignEffect(e1, card, card.controller);
         duel.FinishHandle();
     }
@@ -84,7 +84,7 @@ public class C37742478 : ICardScripts
                     {
                         return true;
                     }
-                    if (e.Attackeder.controller.isMy && e.Attackeder.GetCurAttribute().IsBind(ComVal.CardAttr_Light))
+                    if (e.Attackeder.controller==card.controller && e.Attackeder.GetCurAttribute().IsBind(ComVal.CardAttr_Light))
                     {
                         return true;
                     }

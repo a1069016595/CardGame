@@ -374,9 +374,10 @@ public class Duel : MonoBehaviour, IDuel
             console.Log("切换阶段错误");
             return;
         }
+        currentPhase = phase;
         normalDele d = delegate
         {
-            currentPhase = phase;
+            
             if (ComVal.isBind(currentPhase, ComVal.Phase_Drawphase))
             {
                 EnterDrawPhase();
@@ -1534,8 +1535,14 @@ public class Duel : MonoBehaviour, IDuel
                 else
                 {
                     if (theDele != null)
-                        theDele();
-                    CreateCode(a, player, ComVal.code_SpecialSummon, reasonCard, reason, reasonEffect);
+                    {
+                        AddDelegate(theDele);
+                        CreateCode(a, player, ComVal.code_SpecialSummon, reasonCard, reason, reasonEffect, true,true);
+                    }
+                    else
+                    {
+                        CreateCode(a, player, ComVal.code_SpecialSummon, reasonCard, reason, reasonEffect);
+                    }
                 }
             };
             AddDelegate(d2, "产生特殊召唤成功时点");
@@ -2661,7 +2668,7 @@ public class Duel : MonoBehaviour, IDuel
     /// <param name="reasonCard">原因卡片</param>
     /// <param name="theReason">原因</param>
     /// <param name="reasonEffect">原因效果</param>
-    void CreateCode(Group group, Player player, Int64 codeVal, Card reasonCard, int theReason, BaseEffect reasonEffect, bool isFinishHandle = false)
+    void CreateCode(Group group, Player player, Int64 codeVal, Card reasonCard, int theReason, BaseEffect reasonEffect, bool isFinishHandle = false, bool isDebug = false)
     {
         Reason reason = new Reason(theReason, reasonCard, reasonEffect);
         Code code = new Code(player);
@@ -2690,8 +2697,10 @@ public class Duel : MonoBehaviour, IDuel
                 list.AddRange(CheckCanLauchEffect(GetOpsitePlayer(player), code, true));//检测
                 console.Log("处理延迟效果: " + ComStr.GetCodeMes(code.code) + "必发效果数量：  " + list.Count);
             }
-            if (list.Count != 0)
+            if (list.Count != 0 || GetNotInChainEffect(player, code).Count > 0)
             {
+                //if (isDebug)
+                //    Debug.Log("mj");
                 console.Log("加入到等待处理的时点列表");
                 waitToCode.Add(code);
             }
@@ -2733,7 +2742,8 @@ public class Duel : MonoBehaviour, IDuel
             HandleMustLauchEffect(targetPlayer);
         };
         AddDelegate(d);
-        List<LauchEffect> list = GetNotInChainEffect(targetPlayer);
+        List<LauchEffect> list = GetNotInChainEffect(targetPlayer,curCode);
+        //Debug.Log(list.Count);
         HandleNotInChainEffect(list);
     }
 
@@ -2781,16 +2791,16 @@ public class Duel : MonoBehaviour, IDuel
         }
     }
 
-    private List<LauchEffect> GetNotInChainEffect(Player player)
+    private List<LauchEffect> GetNotInChainEffect(Player player,Code code)
     {
         List<Card> canLauchEffectList = new List<Card>();
-        canLauchEffectList = CheckCanLauchEffect(player, curCode, false, true);
-        canLauchEffectList.AddRange(CheckCanLauchEffect(GetOpsitePlayer(player), curCode, false, true));
+        canLauchEffectList = CheckCanLauchEffect(player, code, false, true);
+        canLauchEffectList.AddRange(CheckCanLauchEffect(GetOpsitePlayer(player), code, false, true));
 
         List<LauchEffect> list = new List<LauchEffect>();
         foreach (var item in canLauchEffectList)
         {
-            list.AddRange(item.GetNotInChainEffectList(curCode, curChain));
+            list.AddRange(item.GetNotInChainEffectList(code, curChain));
             console.Log("不进入连锁效果数量：" + list.Count);
         }
         return list;
@@ -3814,6 +3824,7 @@ public class Duel : MonoBehaviour, IDuel
             {
                 if (item.lauchCode == resetCode)
                 {
+                   
                     result = item;
                     duelActionList.RemoveAt(i);
                     break;

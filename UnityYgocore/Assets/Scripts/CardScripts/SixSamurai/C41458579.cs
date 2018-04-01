@@ -38,7 +38,8 @@ public class C41458579 : ICardScripts
 
     public bool CheckLauch(IDuel duel, Card card, LauchEffect effect, Code code)
     {
-        return duel.GetCurChain().GetLastEffect().category.IsBind(ComVal.category_destroy)
+        return duel.GetCurChain().GetLastEffect().ownerCard.controller != card.controller &&
+            duel.GetCurChain().GetLastEffect().category.IsBind(ComVal.category_destroy)
             && duel.GetIncludeNameCardNumFromArea(ComStr.KeyWord_SixSamurai, false, card.controller, ComVal.cardType_Monster, ComVal.Area_Monster, Fiter) > 0;
     }
 

@@ -36,6 +36,7 @@ public class C27970830 : ICardScripts
         e3.SetCheckLauch(CheckLauch2);
         e3.SetCategory(ComVal.category_pointer);
         e3.SetGetTarget(GetTarget2);
+        e3.SetDescribe("场上表侧表示存在的1只名字带有「六武众」或「紫炎」的效果怪兽的攻击力直到这个回合的结束阶段时上升500。");
         duel.ResignEffect(e3, card, player);
 
         LauchEffect e4 = new LauchEffect();//回手牌
@@ -44,8 +45,9 @@ public class C27970830 : ICardScripts
         e4.SetLauchArea(ComVal.Area_NormalTrap);
         e4.SetOperation(Operation3);
         e4.SetCost(Cost3);
-        e3.SetCheckLauch(CheckLauch3);
+        e4.SetCheckLauch(CheckLauch3);
         e4.SetCategory(ComVal.category_pointer|ComVal.category_toHand);
+        e4.SetDescribe("从自己的卡组·墓地把1只名字带有「六武众」的怪兽加入手卡。");
         duel.ResignEffect(e4, card, player);
 
         LauchEffect e5 = new LauchEffect();//复生
@@ -54,8 +56,9 @@ public class C27970830 : ICardScripts
         e5.SetLauchArea(ComVal.Area_NormalTrap);
         e5.SetOperation(Operation4);
         e5.SetCost(Cost4);
-        e3.SetCheckLauch(CheckLauch4);
+        e5.SetCheckLauch(CheckLauch4);
         e5.SetCategory(ComVal.category_pointer|ComVal.category_spSummon);
+        e5.SetDescribe("从自己墓地把1只名字带有「紫炎」的效果怪兽特殊召唤。");
         duel.ResignEffect(e5, card, player);
     }
 
@@ -162,8 +165,7 @@ public class C27970830 : ICardScripts
         e1.SetStateEffectType(ComVal.stateEffectType_addAfkVal);
         e1.SetTarget(targetCard);
         e1.SetStateEffectVal(500);
-        e1.SetResetCode(ComVal.resetEvent_LeaveEndPhase, 1);
-
+        e1.SetResetCode(ComVal.resetEvent_LeaveEndPhase, 0);
         duel.ResignEffect(e1, card, card.controller);
         duel.FinishHandle();
     }
@@ -183,6 +185,7 @@ public class C27970830 : ICardScripts
     private void Operation1(IDuel duel, Card card, LauchEffect effect, Group target = null)
     {
         card.AddPointer(ComStr.Pointer_Samurai, 2, 1000);
+        duel.FinishHandle();
     }
 
     private bool CheckLauch1(IDuel duel, Card card, LauchEffect effect, Code code)

@@ -65,7 +65,7 @@ public class C22624373 : ICardScripts
         e1.SetCardEffectType(ComVal.cardEffectType_Single | ComVal.cardEffectType_normalStateEffect);
         e1.SetStateEffectType(ComVal.stateEffectType_unableChangeType);
         e1.SetTarget(card);
-        e1.SetResetCode(ComVal.resetEvent_LeaveEndPhase, 3);
+        e1.SetResetCode(ComVal.resetEvent_LeaveEndPhase, 1);
         duel.ResignEffect(e1, card, card.controller);
     }
 

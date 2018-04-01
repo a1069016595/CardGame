@@ -64,7 +64,7 @@ public class C63060238 : ICardScripts
                 e1.SetTarget(card);
                 e1.SetStateEffectVal(c.attribute);
 
-                e1.SetResetCode(ComVal.resetEvent_LeaveEndPhase, 1);
+                e1.SetResetCode(ComVal.resetEvent_LeaveEndPhase, 0);
 
                 StateEffect e2 = e1.Clone() as StateEffect;
                 e2.SetStateEffectType(ComVal.stateEffectType_ChangeAttack);
@@ -83,7 +83,7 @@ public class C63060238 : ICardScripts
                 e4.SetTargetType(TargetPlayerType.my);
                 e4.SetLimitEffectType(ComVal.limitEffectType_spSummonLimit);
                 e4.SetLimitEffectHandler(limitEffectHandler);
-                e4.SetResetCode(ComVal.resetEvent_LeaveEndPhase, 1);
+                e4.SetResetCode(ComVal.resetEvent_LeaveEndPhase, 0);
                 duel.ResignEffect(e4, card, card.ownerPlayer);
                 duel.FinishHandle();
             };

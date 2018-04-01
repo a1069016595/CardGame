@@ -74,7 +74,7 @@ public class C00423585 : ICardScripts
                         e1.SetCardEffectType(ComVal.cardEffectType_Single|ComVal.cardEffectType_normalStateEffect);
                         e1.SetTarget(target);
                         e1.SetStateEffectType(ComVal.stateEffectType_unableAttack);
-                        e1.SetResetCode(ComVal.resetEvent_LeaveEndPhase,1);
+                        e1.SetResetCode(ComVal.resetEvent_LeaveEndPhase,0);
                         duel.ResignEffect(e1, card, card.ownerPlayer);
                         duel.FinishHandle();
                     };

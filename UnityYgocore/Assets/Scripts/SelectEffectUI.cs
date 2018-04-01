@@ -54,7 +54,7 @@ public class SelectEffectUI : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void ShowSelectEffectDialogBox(IntDele dele,List<string> effectList,bool isMy)
+    public void ShowSelectEffectDialogBox(IntDele dele, List<string> effectList, bool isMy)
     {
         Duel.GetInstance().SetSelect();
         rectTransform.localScale = new Vector3(1, 0, 1);
@@ -67,10 +67,8 @@ public class SelectEffectUI : MonoBehaviour
 
         callBack = dele;
 
-        if(length>1)
-        {
-            rightButton.gameObject.SetActive(true);
-        }
+        leftButton.gameObject.SetActive(false);
+        rightButton.gameObject.SetActive(true);
 
         ShowText();
     }

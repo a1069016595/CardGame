@@ -36,7 +36,7 @@ public class C80321197 : ICardScripts
         LimitPlayerEffect e1 = new LimitPlayerEffect();
         e1.SetCategory(ComVal.category_limitEffect | ComVal.category_limitTime);
         e1.SetLimitEffectType(ComVal.limitEffectType_spSummonLimit);
-        e1.SetResetCode(ComVal.resetEvent_LeaveEndPhase, 2);
+        e1.SetResetCode(ComVal.resetEvent_LeaveEndPhase, 1);
         e1.SetTargetType(TargetPlayerType.other);
         e1.SetLimitEffectHandler(LimitEffectHandler);
         duel.ResignEffect(e1, card, card.controller);

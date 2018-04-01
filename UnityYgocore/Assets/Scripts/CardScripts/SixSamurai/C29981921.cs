@@ -35,7 +35,8 @@ public class C29981921 : ICardScripts
 
     public bool CheckLauch(IDuel duel, Card card, LauchEffect effect, Code code)
     {
-        if (duel.GetCurChain().GetLastEffect().ownerCard.cardType.IsBind(ComVal.cardType_Spell | ComVal.cardType_Trap))
+        Card c=duel.GetCurChain().GetLastEffect().ownerCard;
+        if (c.cardType.IsBind(ComVal.cardType_Spell | ComVal.cardType_Trap)&&c.controller!=card.controller)
         {
             return true;
         }
