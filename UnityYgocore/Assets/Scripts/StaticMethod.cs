@@ -67,6 +67,30 @@ public static class StaticMethod
         return texture;
     }
 
+    public static Texture GetCardTexture(string id, bool isSmall)
+    {
+        Texture texture;
+        if (id == ComStr.CardId_Null)
+        {
+            return Resources.Load("Prefebs/cover", typeof(Texture)) as Texture;
+        }
+        if (isSmall)
+        {
+
+            texture = Resources.Load("SmallPics/" + id, typeof(Texture)) as Texture;
+
+        }
+        else
+        {
+            texture = Resources.Load("Pics/" + id, typeof(Texture)) as Texture;
+        }
+        if (texture == null)
+        {
+            texture = Resources.Load("unknown", typeof(Texture)) as Texture;
+        }
+        return texture;
+    }
+
     /// <summary>
     /// xml中的cardtype为中文字符串 需要转为int类型
     /// <para>错误时返回0</para>

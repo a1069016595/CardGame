@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class BaseUI : MonoBehaviour
+public class BaseUI : BaseMonoBehivour
 {
     public string name;
 
@@ -16,6 +16,11 @@ public class BaseUI : MonoBehaviour
     }
 
     public virtual void Init()
+    {
+
+    }
+
+    public virtual void Show()
     {
 
     }

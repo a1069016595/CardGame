@@ -74,7 +74,6 @@ public class LoadXml : MonoBehaviour
 
     public static Card GetCard(string cardID)
     {
-
         if (CardDic.ContainsKey(cardID) == false)
         {
             Debug.Log(cardID);

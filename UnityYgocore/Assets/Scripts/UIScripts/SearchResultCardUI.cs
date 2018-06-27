@@ -6,7 +6,7 @@ using System.Collections.Generic;
 //一页有7个prefeb
 public class SearchResultCardUI : MonoBehaviour
 {
-    
+
     #region 单例
     private static SearchResultCardUI instance;
 
@@ -52,9 +52,13 @@ public class SearchResultCardUI : MonoBehaviour
 
         layoutGroup = this.transform.FindChild("layoutGroup").GetComponent<RectTransform>();
         cardPrefeb = Resources.Load("Prefebs/prefeb_searchResultCard") as GameObject;
-        cardList = new List<Card_SearchResult>();
+
+        ClearCardList();
+
         curPage = 1;
 
+        leftButton.onClick.RemoveAllListeners();
+        rightButton.onClick.RemoveAllListeners();
         leftButton.onClick.AddListener(LeftButtonClick);
         rightButton.onClick.AddListener(RightButtonClick);
 
@@ -62,6 +66,14 @@ public class SearchResultCardUI : MonoBehaviour
         text.text = "0/0";
     }
 
+    private void ClearCardList()
+    {
+        for (int i = 0; i < cardList.Count; i++)
+        {
+            Destroy(cardList[i].gameObject);
+        }
+        cardList = new List<Card_SearchResult>();
+    }
 
     /// <summary>
     /// 向后翻
@@ -119,7 +131,7 @@ public class SearchResultCardUI : MonoBehaviour
             card_select.Init();
             cardList.Add(card_select);
             card_select.SetActive(false);
-          
+
         }
     }
 
@@ -128,7 +140,7 @@ public class SearchResultCardUI : MonoBehaviour
     /// </summary>
     public void ShowSearchCard(List<string> list)
     {
-       
+
         this.gameObject.SetActive(true);
         if ((list.Count % 7) != 0)
         {
@@ -141,7 +153,7 @@ public class SearchResultCardUI : MonoBehaviour
         curPage = 1;
         currentCardList = list;
         curShowList = new List<string>();
-      
+
         if (currentCardList.Count <= 7)
         {
             for (int i = 0; i < currentCardList.Count; i++)
@@ -158,7 +170,7 @@ public class SearchResultCardUI : MonoBehaviour
                 curShowList.Add(str);
             }
         }
-       
+
         Show(curShowList);
         UpdateText();
     }
@@ -182,7 +194,7 @@ public class SearchResultCardUI : MonoBehaviour
             Card_SearchResult card_select = cardList[i];
             card_select.SetActive(false);
         }
-      
+
     }
 
     private void UpdateText()

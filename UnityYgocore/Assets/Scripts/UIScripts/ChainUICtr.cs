@@ -14,8 +14,6 @@ public class ChainUICtr : MonoBehaviour
 
     void Awake()
     {
-        DuelEventSys.GetInstance.updateUI_chainUI += GetInstance_updateUI_chainUI;
-        DuelEventSys.GetInstance.uiAnim_chainAnim += GetInstance_uiAnim_chainAnim;
 
         freeChainNumUIList = new List<ChainNumUI>();
         activeChainNumUIList = new List<ChainNumUI>();
@@ -29,7 +27,7 @@ public class ChainUICtr : MonoBehaviour
         }
     }
 
-    void GetInstance_uiAnim_chainAnim(normalDele dele)
+    public void PlayChainAnim(normalDele dele)
     {
         activeChainNumUIList[activeChainNumUIList.Count - 1].ShowFlashAnim(dele);
     }
@@ -39,7 +37,7 @@ public class ChainUICtr : MonoBehaviour
         duelUIMgr = DuelUIManager.GetInstance();
     }
 
-    void GetInstance_updateUI_chainUI(Chain chain)
+    public void UpdateChainUI(Chain chain)
     {
         for (int i = activeChainNumUIList.Count; i < chain.chainNum; i++)
         {

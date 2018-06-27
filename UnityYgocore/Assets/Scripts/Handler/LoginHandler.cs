@@ -22,7 +22,7 @@ public class LoginHandler : MonoBehaviour, IHandler
     public void Init()
     {
         errorManager = ErrorManager.GetInstance();
-        uiMgr = UIMgr.GetInstance();
+        uiMgr = UIMgr.Instance();
     }
 
     public void MessageReceive(SocketModel model)

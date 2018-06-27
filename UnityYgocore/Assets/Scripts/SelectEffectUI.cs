@@ -3,10 +3,10 @@ using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using DG.Tweening;
-
+using Protocol;
 public delegate void SelectEffectCallBack(LauchEffect  effect);
 
-public class SelectEffectUI : MonoBehaviour
+public class SelectEffectUI : DuelUIOpearate
 {
     #region 单例
     private static SelectEffectUI instance;
@@ -45,17 +45,47 @@ public class SelectEffectUI : MonoBehaviour
         applyButton = transform.FindChild("applyButton").GetComponent<Button>();
         rectTransform = transform.GetComponent<RectTransform>();
         rightButton.onClick.AddListener(OnRightButton);
-        leftButton.onClick.AddListener(OnLeftButton);
+        leftButton.onClick.AddListener(OnLeftButton); 
         applyButton.onClick.AddListener(OnApplyButton);
 
         leftButton.gameObject.SetActive(false);
         rightButton.gameObject.SetActive(false);
 
         gameObject.SetActive(false);
+
+        AddHandler(DuelEvent.netEvent_ReciveChangeSelectEffect, ReciveChangeSelectEffect);
+        AddHandler(DuelEvent.netEvent_ReciveApplySelectEffect, ReciveApplySelectEffect);
+
+        AddHandler(DuelEvent.playBackEvent_SelectEffect, PlayBackSelectEffect);
+    }
+
+    private void PlayBackSelectEffect(params object[] args)
+    {
+        curRank = (int)args[0];
+        OperateApplyButton();
+    }
+
+    private void ReciveApplySelectEffect(params object[] args)
+    {
+        OperateApplyButton();
+    }
+
+    private void ReciveChangeSelectEffect(params object[] args)
+    {
+        DuelSelectEffectButtonDTO mes = (DuelSelectEffectButtonDTO)args[0];
+        if (mes.isRight)
+        {
+            OperateRightButton();
+        }
+        else
+        {
+            OperateLeftButton();
+        }
     }
 
     public void ShowSelectEffectDialogBox(IntDele dele, List<string> effectList, bool isMy)
     {
+        isMySelect = isMy;
         Duel.GetInstance().SetSelect();
         rectTransform.localScale = new Vector3(1, 0, 1);
         Tweener a = rectTransform.DOScaleY(1, 0.1f);
@@ -75,26 +105,53 @@ public class SelectEffectUI : MonoBehaviour
 
     private void OnRightButton()
     {
-        if(curRank==length-1)
+        if (CanNotControl())
         {
             return;
         }
+        if (curRank == length - 1)
+        {
+            return;
+        }
+        if (IsSendMes())
+        {
+            DuelEventSys.GetInstance.SendEvent(DuelEvent.netEvent_SendChangeSelectEffect, true);
+        }
+        OperateRightButton();
+    }
+
+    private void OperateRightButton()
+    {
         curRank++;
-        if(curRank==length-1)
+        if (curRank == length - 1)
         {
             rightButton.gameObject.SetActive(false);
         }
         leftButton.gameObject.SetActive(true);
         ShowText();
     }
+
     private void OnLeftButton()
     {
-        if(curRank==0)
+        if (CanNotControl())
         {
             return;
         }
-        curRank --;
-        if(curRank==0)
+        if (curRank == 0)
+        {
+            return;
+        }
+        if (IsSendMes())
+        {
+            DuelEventSys.GetInstance.SendEvent(DuelEvent.netEvent_SendChangeSelectEffect, false);
+        }
+        OperateLeftButton();
+    }
+
+    private void OperateLeftButton()
+    {
+        curRank--;
+        if (curRank == 0)
         {
             leftButton.gameObject.SetActive(false);
         }
@@ -104,20 +161,41 @@ public class SelectEffectUI : MonoBehaviour
 
     private void OnApplyButton()
     {
-       
+        if (CanNotControl())
+        {
+            return;
+        }
+        if (IsSendMes())
+        {
+           eventSys.SendEvent(DuelEvent.netEvent_SendApplySelectEffect);
+        }
+        eventSys.SendEvent(DuelEvent.duelEvent_RecordOperate, RecordEvent.recordEvent_SelectEffect, curRank);
+        OperateApplyButton();
+    }
+
+    private void OperateApplyButton()
+    {
         Tweener a = rectTransform.DOScaleY(0, 0.1f);
         a.SetEase(Ease.Linear);
 
+        eventSys.SendEvent(DuelEvent.uiEvent_ShowOperateTip, describeList[curRank]);
+
         a.onComplete = delegate
         {
-            Duel.GetInstance().SetNotSelect();
-            callBack(curRank);
-            gameObject.SetActive(false);
+            StartCoroutine(CallBack());
         };
+    }
+    
+    IEnumerator CallBack()
+    {
+        yield return new WaitForSeconds(2.5f);
+        Duel.GetInstance().SetNotSelect();
+        callBack(curRank);
+        gameObject.SetActive(false);
     }
 
     private void ShowText()
     {
-        effectText.text =describeList[curRank];
+        effectText.text = describeList[curRank];
     }
 }

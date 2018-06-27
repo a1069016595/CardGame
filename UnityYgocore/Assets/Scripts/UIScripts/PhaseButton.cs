@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class PhaseButton : MonoBehaviour,IPointerClickHandler
+public class PhaseButton : BaseMonoBehivour, IPointerClickHandler
 {
     public Text text;
     public Button button;

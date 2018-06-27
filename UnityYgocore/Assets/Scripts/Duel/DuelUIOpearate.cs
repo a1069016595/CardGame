@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DuelUIOpearate : MonoBehaviour
+public class DuelUIOpearate : BaseMonoBehivour
 {
     protected bool isMySelect;
 
@@ -13,6 +13,6 @@ public class DuelUIOpearate : MonoBehaviour
 
     protected bool CanNotControl()
     {
-        return Duel.GetInstance().IsNetWork && !isMySelect;
+        return (Duel.GetInstance().IsNetWork && !isMySelect) || Duel.GetInstance().IsPlayBack||Duel.GetInstance().isFinishGame;
     }
 }

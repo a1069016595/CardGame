@@ -79,5 +79,15 @@ public class Deck
         mainDeck.SortGroup();
         extraDeck.SortGroup();
     }
+
+    public string[] GetMainDeck()
+    {
+        return mainDeck.GetCardIDList().ToArray();
+    }
+
+    public string[] GetExtraDeck()
+    {
+        return extraDeck.GetCardIDList().ToArray();
+    }
 }
 

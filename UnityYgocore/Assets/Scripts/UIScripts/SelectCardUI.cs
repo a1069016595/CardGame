@@ -72,8 +72,17 @@ public class SelectCardUI : DuelUIOpearate
         InitCardGroup();
         this.gameObject.SetActive(false);
 
-        DuelEventSys.GetInstance.AddHandler(DuelEvent.netEvent_ReciveSelectCardGroup, ReciveSelectCardGroup);
-        DuelEventSys.GetInstance.AddHandler(DuelEvent.netEvent_ReciveSelectGroupCardCon, ReciveSelectCardGroupCon);
+        AddHandler(DuelEvent.netEvent_ReciveSelectCardGroup, ReciveSelectCardGroup);
+        AddHandler(DuelEvent.netEvent_ReciveSelectGroupCardCon, ReciveSelectCardGroupCon);
+
+        AddHandler(DuelEvent.playBackEvent_SelectCardGroup, PlayBackSelectCardGrpup);
+
+    }
+
+    private void PlayBackSelectCardGrpup(params object[] args)
+    {
+        SelectCard((int)args[0]);
+        HandleApplyButton();
     }
 
     private void ReciveSelectCardGroupCon(params object[] args)
@@ -100,7 +109,7 @@ public class SelectCardUI : DuelUIOpearate
     private void ReciveSelectCardGroup(params object[] args)
     {
         DuelSelectGroupCardDTO dto = (DuelSelectGroupCardDTO)args[0];
-        if( dto.isSelect)
+        if (dto.isSelect)
         {
             SelectCard(dto.rank);
         }
@@ -136,23 +145,28 @@ public class SelectCardUI : DuelUIOpearate
             if (curSelectNum < curMaxSelectNum)
                 return;
         }
-        
+
         Tweener a = rectTransform.DOScaleY(0, 0.15f);
         a.SetEase(Ease.Linear);
 
         a.onComplete = delegate
         {
             Group theGroup = new Group();
+            List<int> recordList = new List<int>();
             for (int i = 0; i < choseList.Count; i++)
             {
                 if (choseList[i])
                 {
                     Card card = currentCardGroup.GetCard(i);
                     theGroup.AddCard(card);
+                    recordList.Add(i);
                 }
             }
             this.gameObject.SetActive(false);
             Duel.GetInstance().SetNotSelect();
+
+            eventSys.SendEvent(DuelEvent.duelEvent_RecordOperate, RecordEvent.recordEvent_SelectCardGroup, recordList);
+
             if (curCallBack != null)
             {
                 curCallBack(theGroup);
@@ -170,11 +184,11 @@ public class SelectCardUI : DuelUIOpearate
             return;
         }
 
-        if(CanNotControl())
+        if (CanNotControl())
         {
             return;
         }
-        if(IsSendMes())
+        if (IsSendMes())
         {
             DuelEventSys.GetInstance.SendEvent(DuelEvent.netEvent_SendSelectGroupCardCon, 1);
         }
@@ -250,7 +264,7 @@ public class SelectCardUI : DuelUIOpearate
 
     void card_select_event_selectCard(int num, Card_Select obj)
     {
-        if (curMaxSelectNum!=-1&& curSelectNum == curMaxSelectNum)
+        if (curMaxSelectNum != -1 && curSelectNum == curMaxSelectNum)
         {
             return;
         }
@@ -301,7 +315,7 @@ public class SelectCardUI : DuelUIOpearate
         }
     }
 
-    public void ShowSelectCardUI(Group cardGroup, GroupCardSelectBack callBack, int num,bool isMy,bool isMax)
+    public void ShowSelectCardUI(Group cardGroup, GroupCardSelectBack callBack, int num, bool isMy, bool isMax)
     {
         curPage = 1;
         curSelectNum = 0;
@@ -313,10 +327,10 @@ public class SelectCardUI : DuelUIOpearate
 
         isMySelect = isMy;
         Duel.GetInstance().SetSelect();
-        rectTransform.localScale = new Vector3(0.5f, 0,1);
+        rectTransform.localScale = new Vector3(0.5f, 0, 1);
         Tweener a = rectTransform.DOScaleY(0.5f, 0.15f);
         a.SetEase(Ease.Linear);
-        
+
         curMaxSelectNum = num;
         this.gameObject.SetActive(true);
         if ((cardGroup.GroupNum % 10) != 0)
@@ -353,7 +367,7 @@ public class SelectCardUI : DuelUIOpearate
                 curShowGroup.AddCard(card);
             }
         }
-       
+
         Show(curShowGroup);
 
 
@@ -400,6 +414,4 @@ public class SelectCardUI : DuelUIOpearate
         }
         UpdateText();
     }
-
 }
-

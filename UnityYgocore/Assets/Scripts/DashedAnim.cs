@@ -21,17 +21,31 @@ public class DashedAnim : MonoBehaviour
     }
 
 
-    public void StartSelectState()
+    public void StartSelectState(bool isMySelect)//网络模式下，己方选择时才显示
     {
-        gameObject.SetActive(true);
-        StartCoroutine(anim(texture2));
+        if (Duel.GetInstance().IsNetWork)
+        {
+            if (isMySelect)
+            {
+                gameObject.SetActive(true);
+                StartCoroutine(anim(texture2));
+            }
+        }
+        else
+        {
+            gameObject.SetActive(true);
+            StartCoroutine(anim(texture2));
+        }
     }
 
     public void EndSelectState()
     {
-        EndAnim();
-        gameObject.SetActive(false);
-        image.texture = texture1;
+        if (gameObject.activeSelf)
+        {
+            EndAnim();
+            gameObject.SetActive(false);
+            image.texture = texture1;
+        }
     }
 
     private void EndAnim()
@@ -58,7 +72,10 @@ public class DashedAnim : MonoBehaviour
 
     public void SetNotSelect()
     {
-        StartCoroutine(anim(texture2));
+        if (gameObject.activeSelf)
+        {
+            StartCoroutine(anim(texture2));
+        }
     }
 }
   

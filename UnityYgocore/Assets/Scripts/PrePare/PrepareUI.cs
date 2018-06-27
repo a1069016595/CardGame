@@ -7,8 +7,11 @@ using System.Collections.Generic;
 
 /// <summary>
 /// 房主的准备开关一直为打开状态
+/// 
+/// 这里房主点开始游戏时 发送房主的卡组信息
+/// 不是房主时 改变选项时发送卡组信息
 /// </summary>
-public class PrepareUI : BaseUI,IHandler
+public class PrepareUI : BaseUI, IHandler
 {
     #region 单例
     private static PrepareUI instance;
@@ -24,8 +27,8 @@ public class PrepareUI : BaseUI,IHandler
     }
     #endregion
 
+    public Toggle hostToggle;
     public Toggle playerToggle;
-    public Toggle myToggle;
 
     public Text playerAccount;
     public Text myAccount;
@@ -44,12 +47,13 @@ public class PrepareUI : BaseUI,IHandler
 
 
 
-    public override void Init()
+    void Awake()
     {
-        uiMgr = UIMgr.GetInstance();
+        Debug.Log("jj");
+        uiMgr = UIMgr.Instance();
 
-        playerToggle = transform.FindChild("PlayerToggle").GetComponent<Toggle>();
-        myToggle = transform.FindChild("MyToggle").GetComponent<Toggle>();
+        hostToggle = transform.FindChild("PlayerToggle").GetComponent<Toggle>();
+        playerToggle = transform.FindChild("MyToggle").GetComponent<Toggle>();
         playerAccount = transform.FindChild("PlayerAccount").GetComponent<Text>();
         myAccount = transform.FindChild("MyAccount").GetComponent<Text>();
         deckDropDown = transform.FindChild("DeckDropdown").GetComponent<Dropdown>();
@@ -60,10 +64,14 @@ public class PrepareUI : BaseUI,IHandler
 
         startButton.onClick.AddListener(OnStartGame);
         exitButton.onClick.AddListener(OnLeaveRoom);
-        myToggle.onValueChanged.AddListener(OnToggleValueChange);
 
+        playerToggle.onValueChanged.AddListener(OnOptionValueChange);
+        deckDropDown.onValueChanged.AddListener(OnChangeSelectDeck);
 
     }
+
+
+
 
     /// <summary>
     /// 进入他人房间
@@ -74,10 +82,12 @@ public class PrepareUI : BaseUI,IHandler
         theHost = false;
         playerAccount.text = mes;
         myAccount.text = ComVal.account;
-        myToggle.isOn = false;
-        myToggle.enabled = true;
+        playerToggle.isOn = false;
+        playerToggle.enabled = true;
         GetDeckList();
+        OnChangeSelectDeck(0);
     }
+
     /// <summary>
     /// 创建房间
     /// </summary>
@@ -87,10 +97,11 @@ public class PrepareUI : BaseUI,IHandler
         theHost = true;
         playerAccount.text = mes.roomOwner;
         myAccount.text = "";
-        myToggle.isOn = false;
-        myToggle.enabled = false;
+        playerToggle.enabled = false;
+        playerToggle.isOn = false;
         GetDeckList();
     }
+
     /// <summary>
     /// 离开房间
     /// </summary>
@@ -100,27 +111,32 @@ public class PrepareUI : BaseUI,IHandler
         uiMgr.LoadUI(ComStr.UI_GameHallUI);
         NetWorkScript.Instance.write(TypeProtocol.TYPE_GAMEHALL_BRQ, 0, GameHallProtocol.GAMEHALL_LEAVEROOM_BRQ, null);
     }
+
     /// <summary>
     /// 开始游戏
     /// </summary>
     public void OnStartGame()
     {
-        DuelMesDTO dto = new DuelMesDTO();
-        Deck a = DeckLoad.LoadDeck(deckDropDown.captionText.text);
-        dto.deck = new Protocol.Deck();
-        dto.deck.mainDeck = a.mainDeck.ToArray();
-        dto.deck.extraDeck = a.extraDeck.ToArray();
-        dto.account = ComVal.account;
-        NetWorkScript.Instance.write(TypeProtocol.TYPE_GAMEHALL_BRQ, 0, GameHallProtocol.GAMEHALL_STARTGAME_BRQ, dto);
+        if (theHost)
+        {
+            DuelMesDTO dto = new DuelMesDTO();
+            Deck a = DeckLoad.LoadDeck(deckDropDown.captionText.text);
+            dto.deck = new Protocol.Deck();
+            dto.deck.mainDeck = a.mainDeck.ToArray();
+            dto.deck.extraDeck = a.extraDeck.ToArray();
+            dto.account = ComVal.account;
+            NetWorkScript.Instance.write(TypeProtocol.TYPE_GAMEHALL_BRQ, 0, GameHallProtocol.GAMEHALL_STARTGAME_BRQ, dto);
+        }
     }
+
     /// <summary>
     /// 其他人进入房间
     /// </summary>
     public void OtherEnterRoom(string mes)
     {
         myAccount.text = mes;
-        myToggle.isOn = false;
-        myToggle.enabled = false;
+        playerToggle.isOn = false;
+        playerToggle.enabled = false;
         Debug.Log("其他人进入房间");
     }
     /// <summary>
@@ -129,8 +145,8 @@ public class PrepareUI : BaseUI,IHandler
     public void OtherLeaveRoom()
     {
         myAccount.text = "";
-        myToggle.isOn = false;
-        myToggle.enabled = false;
+        playerToggle.isOn = false;
+        playerToggle.enabled = false;
         Debug.Log("其他人离开房间");
     }
     /// <summary>
@@ -141,25 +157,35 @@ public class PrepareUI : BaseUI,IHandler
         theHost = true;
         playerAccount.text = ComVal.account;
         myAccount.text = "";
-        myToggle.isOn = false;
-        myToggle.enabled = false;
+        playerToggle.isOn = false;
+        playerToggle.enabled = false;
         // startButton.gameObject.SetActive(true);
         Debug.Log("房主离开房间");
     }
 
-    public void OnToggleValueChange(bool value)
+
+    private void OnChangeSelectDeck(int arg0)
     {
-        if (theHost == false)
+        if (!theHost)
         {
+            Debug.Log("发送 玩家改变卡组");
             DuelMesDTO dto = new DuelMesDTO();
             Deck a = DeckLoad.LoadDeck(deckDropDown.captionText.text);
             dto.deck = new Protocol.Deck();
             dto.deck.mainDeck = a.mainDeck.ToArray();
             dto.deck.extraDeck = a.extraDeck.ToArray();
-            dto.account = ComVal.account;
-            dto.isReady = value;
-            NetWorkScript.Instance.write(TypeProtocol.TYPE_GAMEHALL_BRQ, 0, GameHallProtocol.GAMEHALL_READY_BRQ, dto);
+            NetWorkScript.Instance.write(TypeProtocol.TYPE_GAMEHALL_BRQ, 0, GameHallProtocol.GAMEHALL_CHANGEDECK_BRQ, dto);
+        }
+    }
 
+    public void OnOptionValueChange(bool value)
+    {
+        if (!theHost)
+        {
+            Debug.Log("发送 玩家准备");
+            DuelMesDTO dto = new DuelMesDTO();
+            dto.isReady = GetIsReady();
+            NetWorkScript.Instance.write(TypeProtocol.TYPE_GAMEHALL_BRQ, 0, GameHallProtocol.GAMEHALL_READY_BRQ, dto);
         }
     }
 
@@ -179,7 +205,7 @@ public class PrepareUI : BaseUI,IHandler
         switch (model.command)
         {
             case GameHallProtocol.GAMEHALL_LEAVEROOM_CREQ:
-                if(theHost)
+                if (theHost)
                 {
                     OtherLeaveRoom();
                 }
@@ -189,10 +215,10 @@ public class PrepareUI : BaseUI,IHandler
                 }
                 break;
             case GameHallProtocol.GAMEHALL_ENTERROOM_CREQ:
-                if(theHost)
+                if (theHost)
                 {
-                  string str=  model.GetMessage<string>();
-                  OtherEnterRoom(str);
+                    string str = model.GetMessage<string>();
+                    OtherEnterRoom(str);
                 }
                 else
                 {
@@ -202,8 +228,8 @@ public class PrepareUI : BaseUI,IHandler
                 break;
             case GameHallProtocol.GAMEHALL_READY_CREQ:
                 bool mes = model.GetMessage<bool>();
-                myToggle.isOn = mes;
-                if(mes&&theHost)
+                playerToggle.isOn = mes;
+                if (mes && theHost)
                 {
                     startButton.gameObject.SetActive(true);
                 }
@@ -217,10 +243,22 @@ public class PrepareUI : BaseUI,IHandler
     {
         playerAccount.text = "";
         myAccount.text = "";
-        playerToggle.isOn = true;
-        playerToggle.enabled = false;
-        myToggle.isOn = false;
+        hostToggle.isOn = true;
+        hostToggle.enabled = false;
+        playerToggle.isOn = false;
         theHost = false;
         startButton.gameObject.SetActive(false);
+    }
+
+    private bool GetIsReady()
+    {
+        if (theHost)
+        {
+            return hostToggle.isOn;
+        }
+        else
+        {
+            return playerToggle.isOn;
+        }
     }
 }

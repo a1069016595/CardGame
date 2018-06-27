@@ -57,11 +57,13 @@ public class WaitTip : MonoBehaviour
 
     public void ShowWaitTip()
     {
+        //Debug.Log("显示等待提示");
         isShow = true;
         gameObject.SetActive(true);
     }
     public void HideWaitTip()
     {
+        //Debug.Log("隐藏等待提示");
         isShow = false;
         gameObject.SetActive(false);
     }

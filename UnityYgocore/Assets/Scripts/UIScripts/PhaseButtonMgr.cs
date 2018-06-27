@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public delegate  void  PhaseButtonClick(PhaseButton button) ;
 
-public class PhaseButtonMgr : MonoBehaviour
+public class PhaseButtonMgr : DuelUIOpearate
 {
     #region 单例
     private static PhaseButtonMgr instance;
@@ -76,11 +76,24 @@ public class PhaseButtonMgr : MonoBehaviour
             Debug.Log("error");
             return;
         }
-        if (duel.IsNetWork && duel.isMyRound)
+        if(duel.IsPlayBack)
         {
-            DuelEventSys.GetInstance.SendEvent(DuelEvent.netEvent_SendChangePhase, GetPhase(button));
+            return;
         }
-        DuelEventSys.GetInstance.SendEvent(DuelEvent.event_changePhase, GetPhase(button));
+        if (duel.IsNetWork)
+        {
+            if (duel.isMyRound)
+            {
+                eventSys.SendEvent(DuelEvent.netEvent_SendChangePhase, GetPhase(button));
+                eventSys.SendEvent(DuelEvent.duelEvent_changePhase, GetPhase(button));
+                //eventSys.SendEvent(DuelEvent.duelEvent_RecordOperate, RecordEvent.recordEvent_ChangePhase, duel.roundCount, GetPhase(button));
+            }
+        }
+        else
+        {
+            eventSys.SendEvent(DuelEvent.duelEvent_changePhase, GetPhase(button));
+            //eventSys.SendEvent(DuelEvent.duelEvent_RecordOperate, RecordEvent.recordEvent_ChangePhase, duel.roundCount, GetPhase(button));
+        }
     }
 
     public void SetCanControl()

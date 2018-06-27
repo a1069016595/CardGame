@@ -46,7 +46,13 @@ public class SelectCardMgr : DuelUIOpearate
 
         duel = Duel.GetInstance();
 
-        DuelEventSys.GetInstance.AddHandler(DuelEvent.netEvent_ReciveSelectFieldCard, ReciveSelectFieldCard);
+       AddHandler(DuelEvent.netEvent_ReciveSelectFieldCard, ReciveSelectFieldCard);
+        AddHandler(DuelEvent.playBackEvent_SelectFieldCard, PlayBackSelectFieldCard);
+    }
+
+    private void PlayBackSelectFieldCard(params object[] args)
+    {
+        HandleSelectCard((int)args[0],(int)args[1], (bool)args[2]);
     }
 
     private void ReciveSelectFieldCard(params object[] args)
@@ -97,13 +103,18 @@ public class SelectCardMgr : DuelUIOpearate
             }
         }
         if (mg.GroupNum != 0)
-            mFieldMgr.SelectFieldCard(mg);
+            mFieldMgr.SelectFieldCard(mg, isMy);
         if (og.GroupNum != 0)
-            oFieldMgr.SelectFieldCard(og);
+            oFieldMgr.SelectFieldCard(og, isMy);
         if (mhg.GroupNum != 0)
-            mHandCardUI.SelectFieldCard(mhg.GetRankList());
+            mHandCardUI.SelectFieldCard(mhg.GetRankList(), isMy);
         if (ohg.GroupNum != 0)
-            oHandCardUI.SelectFieldCard(ohg.GetRankList());
+            oHandCardUI.SelectFieldCard(ohg.GetRankList(), isMy);
+
+        if (duel.IsNetWork && !isMySelect)
+        {
+            WaitTip.GetInstance().ShowWaitTip();
+        }
     }
 
     Card GetCard(int area, int rank, bool isMy)
@@ -136,6 +147,11 @@ public class SelectCardMgr : DuelUIOpearate
         curSelectNum++;
         if (curMaxSelectNum == curSelectNum)
         {
+            eventSys.SendEvent(DuelEvent.duelEvent_RecordOperate, RecordEvent.recordEvent_SelectFieldCard, selectGroup);
+            if (duel.IsNetWork && !isMySelect)
+            {
+                WaitTip.GetInstance().HideWaitTip();
+            }
             EndSelect();
             Duel.GetInstance().SetNotSelect();
             curDele(selectGroup);

@@ -125,7 +125,7 @@ public class SelectLoadDeckUI : MonoBehaviour
 
     void OnExitButton()
     {
-        UIMgr.GetInstance().LoadUI(ComStr.UI_LoginUI);
+        UIMgr.Instance().LoadUI(ComStr.UI_LoginUI);
     }
 
     void OnDeleteDeckButton()

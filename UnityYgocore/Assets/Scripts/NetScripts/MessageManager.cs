@@ -16,8 +16,13 @@ public class MessageManager : MonoBehaviour
     DuelHandler duelHandler;
 
     ErrorManager errorManager;
+
+    DuelEventSys eventSys;
+
     void Awake()
     {
+        eventSys = DuelEventSys.GetInstance;
+
         gameHallHandler = GameHallHandler.GetInstance();
         loginHandler=LoginHandler.GetInstance();
         errorManager = ErrorManager.GetInstance();
@@ -54,7 +59,7 @@ public class MessageManager : MonoBehaviour
                 loginHandler.MessageReceive(model);
                 break;
             case TypeProtocol.TYPE_DUEL_CREQ:
-                duelHandler.MessageReceive(model);
+                eventSys.SendEvent(DuelEvent.netEvent_ReciveDuelMes, model);
                 break;
             default:
                 Debug.Log("error");

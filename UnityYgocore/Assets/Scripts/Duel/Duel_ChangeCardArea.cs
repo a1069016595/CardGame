@@ -108,10 +108,10 @@ public static class Duel_ChangeCardArea
         {
             DuelUIManager.GetInstance().RemoveCardFromDeck(area, card, 1, player.isMy);
         }
-        if (area == ComVal.Area_MainDeck)
-        {
-            Duel.GetInstance().ShuffleDeck(player);
-        }
+        //if (area == ComVal.Area_MainDeck)
+        //{
+        //    Duel.GetInstance().ShuffleDeck(player);
+        //}
 
         return result;
     }

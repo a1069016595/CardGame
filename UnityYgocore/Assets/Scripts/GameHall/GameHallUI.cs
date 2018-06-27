@@ -5,7 +5,7 @@ using Protocol;
 using UnityEngine.UI;
 public class GameHallUI : BaseUI
 {
-      #region 单例
+    #region 单例
     private static GameHallUI instance;
 
     public GameHallUI()
@@ -19,26 +19,34 @@ public class GameHallUI : BaseUI
     }
     #endregion
 
-  //  public RoomListUI roomListUI;
+    //  public RoomListUI roomListUI;
 
     public Button createRoomBtn;
 
     public CreateRoomPanel createRoomPanel;
 
+
+
     void Awake()
     {
         createRoomBtn = transform.FindChild("CreateRoomBtn").GetComponent<Button>();
-     createRoomPanel = transform.FindChild("CreateRoomPanel").GetComponent<CreateRoomPanel>();
+        createRoomPanel = transform.FindChild("CreateRoomPanel").GetComponent<CreateRoomPanel>();
 
         createRoomPanel.Init();
         createRoomBtn.onClick.AddListener(OnCreateRoomBtn);
     }
 
+    public override void Show()
+    {
+        NetWorkScript.Instance.write(TypeProtocol.TYPE_GAMEHALL_BRQ, 0, GameHallProtocol.GAMEHALL_ENTERGAMEHALL_BRQ, null);
+    }
+
+
     void OnCreateRoomBtn()
     {
         createRoomPanel.Show(CreateRoomDele);
     }
-   
+
     /// <summary>
     /// 创建房间委托
     /// </summary>

@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
 
-public class SelectCardShowUI : MonoBehaviour
+public class SelectCardShowUI : BaseMonoBehivour
 {
 
     public RawImage rawImage;
@@ -12,11 +12,12 @@ public class SelectCardShowUI : MonoBehaviour
 
     void Start()
     {
-        DuelEventSys.GetInstance.onOver_updateSelectCardShow += UpdateCardDisplay;
+        AddHandler(DuelEvent.uiEvent_UpdateSelectCardShow, UpdateCardDisplay);
     }
 
-    public void UpdateCardDisplay(string cardID)
+    public void UpdateCardDisplay(params object[] args)
     {
+        string cardID = (string)args[0];
         if(cardID=="0"||cardID=="")
         {
             return;

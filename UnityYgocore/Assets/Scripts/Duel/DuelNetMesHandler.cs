@@ -3,21 +3,50 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DuelNetMesHandler : MonoBehaviour
+public class DuelNetMesHandler : BaseMonoBehivour
 {
-    DuelEventSys eventSys;
 
     void Awake()
     {
-        eventSys = DuelEventSys.GetInstance;
+        AddHandler(DuelEvent.netEvent_SendDialogBoxSelect, SendDialogBoxSelect);
+        AddHandler(DuelEvent.netEvent_SendOperateCard, SendOperateCard);
+        AddHandler(DuelEvent.netEvent_SendSelectCardGroup, SendSelectCardGroup);
+        AddHandler(DuelEvent.netEvent_SendSelectFieldCard, SendSelectFieldCard);
+        AddHandler(DuelEvent.netEvent_SendSelectGroupCardCon, SendSelectGroupCardCon);
+        AddHandler(DuelEvent.netEvent_SendChangePhase, SendChangePhase);
+        AddHandler(DuelEvent.netEvent_SendSelectPutType, SendSelectPutType);
+        AddHandler(DuelEvent.netEvent_SendChangeSelectEffect, SendChangeSelectEffect);
+        AddHandler(DuelEvent.netEvent_SendApplySelectEffect, SendApplySelectEffect);
+        AddHandler(DuelEvent.netEvent_SendGameEnd, SendGameEnd);
+        AddHandler(DuelEvent.netEvent_SendSurrender, SendSurrender);
+    }
 
-        eventSys.AddHandler(DuelEvent.netEvent_SendDialogBoxSelect, SendDialogBoxSelect);
-        eventSys.AddHandler(DuelEvent.netEvent_SendOperateCard, SendOperateCard);
-        eventSys.AddHandler(DuelEvent.netEvent_SendSelectCardGroup, SendSelectCardGroup);
-        eventSys.AddHandler(DuelEvent.netEvent_SendSelectFieldCard, SendSelectFieldCard);
-        eventSys.AddHandler(DuelEvent.netEvent_SendSelectGroupCardCon, SendSelectGroupCardCon);
-        eventSys.AddHandler(DuelEvent.netEvent_SendChangePhase, SendChangePhase);
-        eventSys.AddHandler(DuelEvent.netEvent_SendSelectPutType, SendSelectPutType);
+    private void SendSurrender(params object[] args)
+    {
+        Debug.Log("发送信息：投降");
+        Send(null, DuelProtocol.Surrender_BRQ);
+    }
+ 
+
+    private void SendGameEnd(params object[] args)
+    {
+        Debug.Log("发送信息：游戏结束");
+        Send(null, DuelProtocol.GameFinish_BRQ);
+    }
+
+    private void SendChangeSelectEffect(params object[] args)
+    {
+        Debug.Log("发送信息：选择效果");
+        DuelSelectEffectButtonDTO dto = new DuelSelectEffectButtonDTO();
+        dto.isRight = (bool)args[0];
+        Send(dto, DuelProtocol.ChangeSelectEffect_BRQ);
+    }
+
+    private void SendApplySelectEffect(params object[] args)
+    {
+        Debug.Log("发送信息：确认选择效果");
+        DuelApplySelectEffectDTO dto = new DuelApplySelectEffectDTO();
+        Send(dto, DuelProtocol.ApplySelectEffect_BRQ);
     }
 
     private void SendSelectPutType(params object[] args)

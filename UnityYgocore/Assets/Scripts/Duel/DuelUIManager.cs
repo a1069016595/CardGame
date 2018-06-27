@@ -60,6 +60,8 @@ public class DuelUIManager : BaseUI
 
     public ErrorPlane tipPlane;
 
+    public ChainUICtr chainUICtr;
+
     ChangeAreaAnim mChangeAreaAnim;
     ChangeAreaAnim oChangeAreaAnim;
 
@@ -97,6 +99,8 @@ public class DuelUIManager : BaseUI
 
         mChangeAreaAnim = GetChild<ChangeAreaAnim>("MAnim");
         oChangeAreaAnim = GetChild<ChangeAreaAnim>("OAnim");
+
+        chainUICtr = GetChild<ChainUICtr>("ChainUIMgr");
 
         selectCardMgr = SelectCardMgr.GetInstance();
         optionListUI = OptionListUI.GetInstance();
@@ -202,9 +206,9 @@ public class DuelUIManager : BaseUI
     public void ShowHandCardDashAnim(List<int> val, bool isMy)
     {
         if (isMy)
-            mHandCardUI.ShowCardDashAnim(val);
+            mHandCardUI.ShowCardDashAnim(val,isMy);
         else
-            oHandCardUI.ShowCardDashAnim(val);
+            oHandCardUI.ShowCardDashAnim(val,isMy);
     }
     public void HideHandCardDashAnim(bool isMy)
     {
@@ -270,6 +274,10 @@ public class DuelUIManager : BaseUI
 
     public void ShowLpChange(float val, bool isAdd)
     {
+        if (val == 0)
+        {
+            return;
+        }
         lpChangeUI.ShowLPChange(val, isAdd);
     }
 
@@ -343,9 +351,9 @@ public class DuelUIManager : BaseUI
     public void ShowFieldDashAnim(List<int> list,  int fieldArea,bool isMy)
     {
         if (isMy)
-            mFieldMgr.ShowDashAnim(list, (FieldUIType)fieldArea);
+            mFieldMgr.ShowDashAnim(list, (FieldUIType)fieldArea, isMy);
         else
-            oFieldMgr.ShowDashAnim(list, (FieldUIType)fieldArea);
+            oFieldMgr.ShowDashAnim(list, (FieldUIType)fieldArea, isMy);
     }
 
     public void HideFieldDashAnim(bool isMy)
@@ -389,6 +397,7 @@ public class DuelUIManager : BaseUI
 
     public void ShowAttackAnim(int Attacker_areaRank, int Attackeder_areaRank, bool isMy, normalDele dele)
     {
+        duel.SetIsAnim(true);
         attackAnim.Show(Attacker_areaRank, Attackeder_areaRank, isMy, dele);
     }
     #endregion
@@ -472,6 +481,16 @@ public class DuelUIManager : BaseUI
         return Vector3.zero;
     }
 
+
+    public void UpdateChainUI(Chain val)
+    {
+        chainUICtr.UpdateChainUI(val);
+    }
+
+    public void PlayChainAnim(normalDele dele)
+    {
+        chainUICtr.PlayChainAnim(dele);
+    }
 
     #region 回调方法
 

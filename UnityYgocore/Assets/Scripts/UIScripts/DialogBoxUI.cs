@@ -41,12 +41,18 @@ public class DialogBoxUI : DuelUIOpearate
         falseButton = this.transform.FindChild("FalseButton").GetComponent<Button>();
         text = this.transform.FindChild("Text").GetComponent<Text>();
         rectTransform = this.GetComponent<RectTransform>();
-      
+
         trueButton.onClick.AddListener(SendTrueMes);
         falseButton.onClick.AddListener(SendFalseMes);
         this.gameObject.SetActive(false);
 
-        DuelEventSys.GetInstance.AddHandler(DuelEvent.netEvent_ReciveDialogBoxSelect, ReciveDialogBoxSelect);
+        AddHandler(DuelEvent.netEvent_ReciveDialogBoxSelect, ReciveDialogBoxSelect);
+        AddHandler(DuelEvent.playBackEvent_DialogBoxSelect, PlayBackSelect);
+    }
+
+    private void PlayBackSelect(params object[] args)
+    {
+        HandleDialogBox((bool)args[0]);
     }
 
     private void ReciveDialogBoxSelect(params object[] args)
@@ -68,9 +74,18 @@ public class DialogBoxUI : DuelUIOpearate
         HideDialogBox(false);
     }
 
-    public void ShowDialogBox(string str, GetMes dele,bool isMy)
+    public void ShowDialogBox(string str, GetMes dele, bool isMy)
     {
         isMySelect = isMy;
+
+        if (Duel.GetInstance().IsNetWork && !isMy)
+        {
+            getMes = dele;
+            Duel.GetInstance().SetSelect();
+            WaitTip.GetInstance().ShowWaitTip();
+            return;
+        }
+
         Duel.GetInstance().SetSelect();
         rectTransform.localScale = new Vector3(1, 0, 1);
         Tweener a = rectTransform.DOScaleY(1, 0.15f);
@@ -87,11 +102,11 @@ public class DialogBoxUI : DuelUIOpearate
 
     void HideDialogBox(bool mes)
     {
-        if(CanNotControl())
+        if (CanNotControl())
         {
             return;
         }
-        if(IsSendMes())
+        if (IsSendMes())
         {
             DuelEventSys.GetInstance.SendEvent(DuelEvent.netEvent_SendDialogBoxSelect, mes);
         }
@@ -100,6 +115,14 @@ public class DialogBoxUI : DuelUIOpearate
 
     private void HandleDialogBox(bool mes)
     {
+        eventSys.SendEvent(DuelEvent.duelEvent_RecordOperate, RecordEvent.recordEvent_DialogBoxSelect, mes);
+        if (Duel.GetInstance().IsNetWork && !isMySelect)
+        {
+            WaitTip.GetInstance().HideWaitTip();
+            Duel.GetInstance().SetNotSelect();
+            getMes(mes);
+            return;
+        }
         trueButton.enabled = false;
         falseButton.enabled = false;
         Tweener a = rectTransform.DOScaleY(0, 0.15f);

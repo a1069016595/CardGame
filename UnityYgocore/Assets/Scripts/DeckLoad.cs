@@ -85,8 +85,6 @@ public class DeckLoad : MonoBehaviour
             {
                 string name = item.Name.Replace(".ydk", "");
                 deckNmae.Add(name);
-
-
             }
         }
         return deckNmae;

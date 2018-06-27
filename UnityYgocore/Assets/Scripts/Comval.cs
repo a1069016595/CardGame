@@ -551,11 +551,11 @@ public class ComStr
     public const string EffectDescribe_40044918_1 = "选最多有这张卡以外的自己场上的名字带有「英雄」的怪兽数量的场上的魔法·陷阱卡破坏。";
     public const string EffectDescribe_40044918_2 = "从卡组把1只名字带有「英雄」的怪兽加入手卡。";
 
-    public const string UI_DuelFieldUI = "DuelFieldUI";
+   // public const string UI_DuelFieldUI = "DuelFieldUI";
     public const string UI_EditCardUI = "EditCardUI";
     public const string UI_LoginUI = "LoginUI";
     public const string UI_GameHallUI = "GameHallUI";
-    public const string UI_PerpareUI = "PrepareUI";
+
 
     #region 关键字
     public const string KeyWord_Hero = "英雄";

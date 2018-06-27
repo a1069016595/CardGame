@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-
+using UnityEngine;
 
 
 
@@ -19,6 +19,10 @@ public class DuelEventSys
 {
     private static DuelEventSys instance;
 
+    public int val = 0;
+
+    private Dictionary<DuelEventHandler, GameObject> objDic;
+
     public static DuelEventSys GetInstance
     {
         get
@@ -28,13 +32,14 @@ public class DuelEventSys
                 instance = new DuelEventSys();
                 instance.Init();
             }
-              
+
             return instance;
         }
     }
 
     private void Init()
     {
+        objDic = new Dictionary<DuelEventHandler, GameObject>();
         handlerList = new HashSet<DuelEventHandler>[(int)DuelEvent.end];
         for (int i = 0; i < handlerList.Length; i++)
         {
@@ -46,72 +51,47 @@ public class DuelEventSys
 
     public void DeleteHandler(DuelEvent e, DuelEventHandler handler)
     {
+        val--;
         handlerList[(int)e].Remove(handler);
     }
 
-    public void AddHandler(DuelEvent e,DuelEventHandler handler)
+    public void AddHandler(DuelEvent e, DuelEventHandler handler, GameObject obj)
     {
+        val++;
+        objDic.Add(handler, obj);
         handlerList[(int)e].Add(handler);
     }
 
-    public void SendEvent(DuelEvent e,params object[] args)
+    public void SendEvent(DuelEvent e, params object[] args)
     {
+        List<DuelEventHandler> nullList = new List<DuelEventHandler>();
         foreach (var item in handlerList[(int)e])
         {
-            item(args);
+            if (objDic[item] == null)
+            {
+                nullList.Add(item);
+            }
+            else
+            {
+                item(args);
+            }
         }
-    }
-
-
-    public event StringEvent onOver_updateSelectCardShow;
-    public event GetOperateListEvent clickButton_GetOperateList;
-
-    public event ChainMesUpdate updateUI_chainUI;
-
-    public event NormalCallBackEvent uiAnim_chainAnim;
-
-
-
-    public void UIAnim_ChainAnim(normalDele dele)
-    {
-        if(uiAnim_chainAnim!=null)
+        foreach (var item in nullList)
         {
-            uiAnim_chainAnim(dele);
-        }
-    }
-
-    public void UpdateUI_ChainUI(Chain chain)
-    {
-        if(updateUI_chainUI!=null)
-        {
-            updateUI_chainUI(chain);
-        }
-    }
-
-
-    public List<string> ClickButton_GetOperateList(int targetArea, int targetRank, bool isMy)
-    {
-        if (clickButton_GetOperateList != null)
-        {
-            return clickButton_GetOperateList(targetArea, targetRank, isMy);
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-    public void OnOver_updateSelectCardShow(string val)
-    {
-        if(onOver_updateSelectCardShow!=null)
-        {
-            onOver_updateSelectCardShow(val);
+            handlerList[(int)e].Remove(item);
         }
     }
 }
 
 public enum DuelEvent
 {
+    gameEvent_OpenChoosePlayBackPlane,
+    gameEvent_CloseChoosePlayBackPlane,
+    gameEvent_EnterPlayBack,
+    gameEvent_ExitPlayBack,
+
+    netEvent_ReciveDuelMes,
+
     netEvent_ReciveSelectFieldCard,
     netEvent_SendSelectFieldCard,
 
@@ -133,10 +113,45 @@ public enum DuelEvent
     netEvent_ReciveSelectPutType,
     netEvent_SendSelectPutType,
 
-    event_operateCard,
-    event_changePhase,
+    netEvent_ReciveChangeSelectEffect,
+    netEvent_SendChangeSelectEffect,
+
+    netEvent_ReciveApplySelectEffect,
+    netEvent_SendApplySelectEffect,
+
+    netEvent_ReciveGameEnd,
+    netEvent_SendGameEnd,
+
+    netEvent_ReciveSurrender,
+    netEvent_SendSurrender,//投降
+
+    duelEvent_operateCard,
+    duelEvent_changePhase,
+    duelEvent_UpdateSelectCardShow,
+    duelEvent_RecordOperate,
+    duelEvent_SavePlayBack,
+    duelEvent_ShowSavePlayBackPanel,
+    duelEvent_Surrender,
 
     uiEvent_ShowFieldCardMes,
     uiEvent_HideFieldCardMes,
+    uiEvent_ShowOperateTip,
+    uiEvent_UpdateSelectCardShow,//鼠标放上时显示卡片放大图及信息
+   
+
+    playBackEvent_StartGame,
+    playBackEvent_OperateCard,
+    playBackEvent_SelectFieldCard,
+    playBackEvent_DialogBoxSelect,
+    playBackEvent_SelectCardGroup,
+    playBackEvent_ChangePhase,
+    playBackEvent_SelectPutType,
+    playBackEvent_SelectEffect,
+    playBackEvent_Surrender,
+
+    playBackEvent_StopPlay,
+    playBackEvent_StartPlay,
+
+
     end,
 }

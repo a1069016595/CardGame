@@ -57,7 +57,7 @@ public class ErrorPlane : MonoBehaviour
         }
         else
         {
-            title.text = "提示";
+            title.text = "消息";
         }
     }
 

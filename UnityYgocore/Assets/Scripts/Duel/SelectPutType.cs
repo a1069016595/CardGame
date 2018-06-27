@@ -35,7 +35,13 @@ public class SelectPutType : DuelUIOpearate
 
         gameObject.SetActive(false);
 
-        DuelEventSys.GetInstance.AddHandler(DuelEvent.netEvent_ReciveSelectPutType, ReiveSelectPutType);
+       AddHandler(DuelEvent.netEvent_ReciveSelectPutType, ReiveSelectPutType);
+        AddHandler(DuelEvent.playBackEvent_SelectPutType, PlayBackSelectPutType);
+    }
+
+    private void PlayBackSelectPutType(params object[] args)
+    {
+        HandleSelectPutType((bool)args[0]);
     }
 
     private void ReiveSelectPutType(params object[] args)
@@ -91,6 +97,8 @@ public class SelectPutType : DuelUIOpearate
 
     private void HandleSelectPutType(bool val)
     {
+        eventSys.SendEvent(DuelEvent.duelEvent_RecordOperate, RecordEvent.recordEvent_SelectPutType, val);
+
         attackType.enabled = false;
         defenceType.enabled = false;
         attackType.GetComponent<RawImage>().color = Color.white;

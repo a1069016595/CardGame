@@ -8,6 +8,10 @@ using System.Text;
 /// </summary>
 public interface IDuel
 {
+    bool IsInAnim();
+
+    void SetIsAnim(bool val);
+
     /// <summary>
     /// 获取当前时点
     /// </summary>

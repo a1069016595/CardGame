@@ -15,7 +15,7 @@ public class BaseCard : MonoBehaviour, IPointerEnterHandler, IPointerClickHandle
 
     public RawImage image;
 
-    
+    public bool isVisual = true;//对于玩家是否可见
 
     public string id;
 
@@ -48,6 +48,14 @@ public class BaseCard : MonoBehaviour, IPointerEnterHandler, IPointerClickHandle
         id = _id;
     }
 
+    public void SetOverTexture(string _id)
+    {
+        image.texture = StaticMethod.GetCardTexture("0", true) ;
+        id = _id;
+    }
+
+   
+
     /// <summary>
     /// 设置为背面
     /// </summary>
@@ -62,7 +70,10 @@ public class BaseCard : MonoBehaviour, IPointerEnterHandler, IPointerClickHandle
     /// <param name="eventData"></param>
     public virtual void OnPointerEnter(PointerEventData eventData)
     {
-        DuelEventSys.GetInstance.OnOver_updateSelectCardShow(id);
+        if (isVisual)
+        {
+            DuelEventSys.GetInstance.SendEvent(DuelEvent.uiEvent_UpdateSelectCardShow,id);
+        }
     }
 
     public virtual int GetCard()

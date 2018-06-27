@@ -49,9 +49,9 @@ public class DrawCardAnim : MonoBehaviour
 
     void Update()
     {
-        if (isMove)
+        if (isMy && isMove)
         {
-            if (rectTransform.localEulerAngles.y < 120 && isMy)
+            if (rectTransform.localEulerAngles.y < 120)
             {
                 image.overrideSprite = cardSprite;
             }

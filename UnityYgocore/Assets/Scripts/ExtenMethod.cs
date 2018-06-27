@@ -45,4 +45,18 @@ public static class ExtenMethod
         }
         return result;
     }
+
+    public static int ToInt(this string val)
+    {
+        int result;
+        int.TryParse(val,out result);
+        return result;
+    }
+
+    public static bool ToBool(this string val)
+    {
+        bool result;
+        bool.TryParse(val, out result);
+        return result;
+    }
 }

@@ -20,6 +20,7 @@ public class Card_Hand : BaseCard, IPointerExitHandler
 
     public void Init(HandCardUI _handCardUI, bool _isMy)
     {
+       
         isMy = _isMy;
         handCardUI = _handCardUI;
         image = this.GetComponent<RawImage>();
@@ -68,11 +69,15 @@ public class Card_Hand : BaseCard, IPointerExitHandler
 
     public override void OnPointerEnter(PointerEventData eventData)
     {
+        if(!isMy)
+        {
+            return;
+        }
         if (isMove)
             return;
         isMove = true;
 
-        DuelEventSys.GetInstance.OnOver_updateSelectCardShow(id);
+        DuelEventSys.GetInstance.SendEvent(DuelEvent.uiEvent_UpdateSelectCardShow, id);
         Tweener tw = rectTransform.DOLocalMoveY(posY + 15, 0.05f);
         tw.SetEase(Ease.Linear);
         tw.onComplete = delegate
@@ -101,9 +106,9 @@ public class Card_Hand : BaseCard, IPointerExitHandler
         };
     }
 
-    public void ShowDashAnim()
+    public void ShowDashAnim(bool isMySelect)
     {
-        HandCardAnim.StartSelectState();
+        HandCardAnim.StartSelectState(isMySelect);
     }
 
     public void HideDashAnim()
@@ -115,10 +120,10 @@ public class Card_Hand : BaseCard, IPointerExitHandler
     /// <summary>
     /// 进入选择状态
     /// </summary>
-    public void EnterSelectState()
+    public void EnterSelectState(bool isMySelect)
     {
         isInSelect = true;
-        HandCardAnim.StartSelectState();
+        HandCardAnim.StartSelectState(isMySelect);
     }
     /// <summary>
     /// 结束选择状态

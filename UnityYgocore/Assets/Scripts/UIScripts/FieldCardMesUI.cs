@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class FieldCardMesUI : MonoBehaviour
+public class FieldCardMesUI : BaseMonoBehivour
 {
 
     Duel duel;
@@ -14,8 +14,8 @@ public class FieldCardMesUI : MonoBehaviour
 
     void Start()
     {
-        DuelEventSys.GetInstance.AddHandler(DuelEvent.uiEvent_ShowFieldCardMes, ShowMesHandler);
-        DuelEventSys.GetInstance.AddHandler(DuelEvent.uiEvent_HideFieldCardMes, HideMesHandler);
+        AddHandler(DuelEvent.uiEvent_ShowFieldCardMes, ShowMesHandler);
+        AddHandler(DuelEvent.uiEvent_HideFieldCardMes, HideMesHandler);
         duel = Duel.GetInstance();
         rectTransform = GetComponent<RectTransform>();
         text = transform.GetChild<Text>("Text");

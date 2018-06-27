@@ -74,7 +74,25 @@ public class ChangeAreaAnim : MonoBehaviour
 
         isInAnim = true;
         isChange = false;
-        image.sprite = StaticMethod.GetCardSprite(cardID, true);
+
+        if (duel.IsNetWork)
+        {
+            if (isMy)
+            {
+                image.sprite = StaticMethod.GetCardSprite(cardID, true);
+            }
+            else
+            {
+                image.sprite = StaticMethod.GetCardSprite("0", true);
+            }
+        }
+        else
+        {
+            image.sprite = StaticMethod.GetCardSprite("0", true);
+        }
+      
+
+
         gameObject.SetActive(true);
         targetRect = GetRect(fromArea, fromRank);
         rectTransform.anchoredPosition3D = targetRect.anchoredPosition3D;

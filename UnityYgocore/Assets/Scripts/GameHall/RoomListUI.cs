@@ -4,21 +4,8 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using Protocol;
 
-public class RoomListUI : MonoBehaviour, IHandler
+public class RoomListUI : MonoSingleton<RoomListUI>, IHandler
 {
-    #region 单例
-    private static RoomListUI instance;
-
-    public RoomListUI()
-    {
-        instance = this;
-    }
-
-    public static RoomListUI GetInstance()
-    {
-        return instance;
-    }
-    #endregion
 
 
     public Button leftButton;
@@ -47,6 +34,7 @@ public class RoomListUI : MonoBehaviour, IHandler
 
     public void Init()
     {
+
         leftButton = this.transform.FindChild("leftButton").GetComponent<Button>();
         rightButton = this.transform.FindChild("rightButton").GetComponent<Button>();
         text = transform.FindChild("text").GetComponent<Text>();
@@ -214,12 +202,10 @@ public class RoomListUI : MonoBehaviour, IHandler
             return;
         }
         List<RoomInfoDTO> list = new List<RoomInfoDTO>();
-       foreach (var item in dto.roomList)
+        foreach (var item in dto.roomList)
         {
             list.Add(item);
         }
-
-
         ShowSearchRoom(list);
     }
 }

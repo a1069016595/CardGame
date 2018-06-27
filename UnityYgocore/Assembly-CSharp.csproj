@@ -48,6 +48,7 @@
   <ItemGroup>
      <Compile Include="Assets\CameraScale.cs" />
      <Compile Include="Assets\Scripts\BaseCard.cs" />
+     <Compile Include="Assets\Scripts\BaseMonoBehivour.cs" />
      <Compile Include="Assets\Scripts\CardEditorScripts\EditUI.cs" />
      <Compile Include="Assets\Scripts\CardEffectAnim.cs" />
      <Compile Include="Assets\Scripts\CardFactroy.cs" />
@@ -141,6 +142,8 @@
      <Compile Include="Assets\Scripts\Duel\CardFusionFitler.cs" />
      <Compile Include="Assets\Scripts\Duel\Chain.cs" />
      <Compile Include="Assets\Scripts\Duel\Code.cs" />
+     <Compile Include="Assets\Scripts\Duel\CreateBack\RecordPlayBackMgr.cs" />
+     <Compile Include="Assets\Scripts\Duel\CreateBack\WatchPlayBackMgr.cs" />
      <Compile Include="Assets\Scripts\Duel\Deck.cs" />
      <Compile Include="Assets\Scripts\Duel\DeckUI.cs" />
      <Compile Include="Assets\Scripts\Duel\DelayAction.cs" />
@@ -169,11 +172,13 @@
      <Compile Include="Assets\Scripts\Duel\HandCardAnim.cs" />
      <Compile Include="Assets\Scripts\Duel\Interface\IDuel.cs" />
      <Compile Include="Assets\Scripts\Duel\Interface\IDuelToUI.cs" />
+     <Compile Include="Assets\Scripts\Duel\PlayBackLoad.cs" />
      <Compile Include="Assets\Scripts\Duel\Player.cs" />
      <Compile Include="Assets\Scripts\Duel\Reason.cs" />
      <Compile Include="Assets\Scripts\Duel\SelectCardMgr.cs" />
      <Compile Include="Assets\Scripts\Duel\SelectPutType.cs" />
      <Compile Include="Assets\Scripts\Duel\SpSummonEvent.cs" />
+     <Compile Include="Assets\Scripts\Duel\SurrenderUI.cs" />
      <Compile Include="Assets\Scripts\Duel\WaitTip.cs" />
      <Compile Include="Assets\Scripts\DuelDele.cs" />
      <Compile Include="Assets\Scripts\DuelOperate.cs" />
@@ -186,6 +191,7 @@
      <Compile Include="Assets\Scripts\GameHall\ChatUI.cs" />
      <Compile Include="Assets\Scripts\GameHall\ChattingUI.cs" />
      <Compile Include="Assets\Scripts\GameHall\CreateRoomPanel.cs" />
+     <Compile Include="Assets\Scripts\GameHall\GameHallMesUI.cs" />
      <Compile Include="Assets\Scripts\GameHall\GameHallUI.cs" />
      <Compile Include="Assets\Scripts\GameHall\Prefeb_Room.cs" />
      <Compile Include="Assets\Scripts\GameHall\RoomListUI.cs" />
@@ -195,8 +201,10 @@
      <Compile Include="Assets\Scripts\Handler\GameHallHandler.cs" />
      <Compile Include="Assets\Scripts\Handler\LoginHandler.cs" />
      <Compile Include="Assets\Scripts\LoadXml.cs" />
+     <Compile Include="Assets\Scripts\LoginUI\ChosePlayBackPlaneUI.cs" />
      <Compile Include="Assets\Scripts\LoginUI\LoginBoxUI.cs" />
      <Compile Include="Assets\Scripts\LoginUI\LoginUI.cs" />
+     <Compile Include="Assets\Scripts\MonoSingleton.cs" />
      <Compile Include="Assets\Scripts\NetScripts\ByteArray.cs" />
      <Compile Include="Assets\Scripts\NetScripts\IHandler.cs" />
      <Compile Include="Assets\Scripts\NetScripts\MessageManager.cs" />
@@ -212,6 +220,7 @@
      <Compile Include="Assets\Scripts\UIAnim.cs" />
      <Compile Include="Assets\Scripts\UIMgr.cs" />
      <Compile Include="Assets\Scripts\UIScripts\AttackAnimUI.cs" />
+     <Compile Include="Assets\Scripts\UIScripts\BasePanelUI.cs" />
      <Compile Include="Assets\Scripts\UIScripts\BaseUI.cs" />
      <Compile Include="Assets\Scripts\UIScripts\Card_SearchResult.cs" />
      <Compile Include="Assets\Scripts\UIScripts\ChainNumUI.cs" />
@@ -222,11 +231,14 @@
      <Compile Include="Assets\Scripts\UIScripts\HandCardUI.cs" />
      <Compile Include="Assets\Scripts\UIScripts\LPChangeUI.cs" />
      <Compile Include="Assets\Scripts\UIScripts\LPSliderUI.cs" />
+     <Compile Include="Assets\Scripts\UIScripts\OperateTextTipUI.cs" />
      <Compile Include="Assets\Scripts\UIScripts\OptionButton.cs" />
      <Compile Include="Assets\Scripts\UIScripts\OptionListUI.cs" />
      <Compile Include="Assets\Scripts\UIScripts\PhaseButton.cs" />
      <Compile Include="Assets\Scripts\UIScripts\PhaseButtonMgr.cs" />
+     <Compile Include="Assets\Scripts\UIScripts\PlayBackUI.cs" />
      <Compile Include="Assets\Scripts\UIScripts\RoundCountUI.cs" />
+     <Compile Include="Assets\Scripts\UIScripts\SavePlayBackUI.cs" />
      <Compile Include="Assets\Scripts\UIScripts\SearchCardUI.cs" />
      <Compile Include="Assets\Scripts\UIScripts\SearchResultCardUI.cs" />
      <Compile Include="Assets\Scripts\UIScripts\SelectCardShowUI.cs" />

@@ -56,13 +56,14 @@ public class FieldMgr : MonoBehaviour
                 return -1;
         }
     }
+
     /// <summary>
     /// 进入选择卡片状态
     /// </summary>
     /// <param name="cardType"></param>
     /// <param name="num"></param>
     /// <param name="dele"></param>
-    public void SelectFieldCard(Group cardGroup)
+    public void SelectFieldCard(Group cardGroup,bool isMySelect)
     {
         if (cardGroup.GroupNum == 0)
         {
@@ -78,7 +79,7 @@ public class FieldMgr : MonoBehaviour
                 return;
             }
             Card_Field cardField = obj.GetComponent<Card_Field>();
-            cardField.EnterSelectState();
+            cardField.EnterSelectState(isMySelect);
         }
     }
 
@@ -422,7 +423,7 @@ public class FieldMgr : MonoBehaviour
         Destroy(obj);
     }
 
-    public void ShowDashAnim(List<int> list, FieldUIType type)
+    public void ShowDashAnim(List<int> list, FieldUIType type,bool isMySelect)
     {
         switch (type)
         {
@@ -430,20 +431,20 @@ public class FieldMgr : MonoBehaviour
                 for (int i = 0; i < list.Count; i++)
                 {
                     int val = list[i];
-                    monsterArray.GetCard(val).GetComponent<Card_Field>().ShowDashAnim();
+                    monsterArray.GetCard(val).GetComponent<Card_Field>().ShowDashAnim(isMySelect);
                 }
                 break;
             case FieldUIType.trap:
                 for (int i = 0; i < list.Count; i++)
                 {
                     int val = list[i];
-                    trapArray.GetCard(val).GetComponent<Card_Field>().ShowDashAnim();
+                    trapArray.GetCard(val).GetComponent<Card_Field>().ShowDashAnim(isMySelect);
                 }
                 break;
             case FieldUIType.areaSpell:
                 if (list.Count > 0)
                 {
-                    fieldSpellCard.GetComponent<Card_Field>().ShowDashAnim();
+                    fieldSpellCard.GetComponent<Card_Field>().ShowDashAnim(isMySelect);
                 }
                 break;
             default:

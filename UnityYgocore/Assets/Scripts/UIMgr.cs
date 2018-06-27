@@ -3,61 +3,48 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using Protocol;
-public class UIMgr : MonoBehaviour
+public class UIMgr : MonoSingleton<UIMgr>
 {
-    #region 单例
-    private static UIMgr instance;
 
-    public UIMgr()
-    {
-        instance = this;
-    }
-
-    public static UIMgr GetInstance()
-    {
-        return instance;
-    }
-    #endregion
+    private GameObject duelFieldUI;
+    public GameObject prepareUI;
 
     public List<BaseUI> uiList;
 
 
-    private BaseUI duelUI;
     private BaseUI editCardUI;
     private BaseUI loginUI;
     private BaseUI gameHallUI;
-    private BaseUI prepareUI;
-   // public BaseUI errorPlane;
+
+
+    private GameObject curUI;
+
+
     void Awake()
     {
         LoadXml.LoadTheXml();
         uiList = new List<BaseUI>();
 
-        //duelFieldUI = GameFieldUI.GetInstance();
-        duelUI = DuelUIManager.GetInstance();
-        duelUI.SetName(ComStr.UI_DuelFieldUI);
+        duelFieldUI = Resources.Load("Prefebs/DuelFieldUI") as GameObject;
+        prepareUI = Resources.Load("Prefebs/PrepareUI") as GameObject;
+
         editCardUI = EditUI.GetInstance();
         editCardUI.SetName(ComStr.UI_EditCardUI);
         loginUI = LoginUI.GetInstance();
         loginUI.SetName(ComStr.UI_LoginUI);
         gameHallUI = GameHallUI.GetInstance();
         gameHallUI.SetName(ComStr.UI_GameHallUI);
-        prepareUI = PrepareUI.GetInstance();
-        prepareUI.SetName(ComStr.UI_PerpareUI);
 
-        //editCardUI.Init();
-        prepareUI.Init();
 
-        uiList.Add(duelUI);
         uiList.Add(editCardUI);
         uiList.Add(loginUI);
         uiList.Add(gameHallUI);
-        uiList.Add(prepareUI);
     }
 
 
     public void LoadUI(string str)
     {
+        DestroyCurUI();
 
         for (int i = 0; i < uiList.Count; i++)
         {
@@ -72,7 +59,17 @@ public class UIMgr : MonoBehaviour
                     editCardUI.Init();
                 }
                 uiList[i].SetUIActive(true);
+                uiList[i].Show();
             }
+        }
+    }
+
+    private void DestroyCurUI()
+    {
+        if (curUI != null)
+        {
+            GameObject.Destroy(curUI);
+            curUI = null;
         }
     }
 
@@ -82,5 +79,35 @@ public class UIMgr : MonoBehaviour
         {
             uiList[i].SetUIActive(false);
         }
+    }
+
+    public void LoadDuelField()
+    {
+        if (curUI != null && curUI.name.Contains("DuelFieldUI"))
+        {
+            return;
+        }
+        LoadUIObj(duelFieldUI);
+    }
+
+    public void LoadPerpareUI()
+    {
+        if (curUI != null && curUI.name.Contains("PrepareUI"))
+        {
+            return;
+        }
+        LoadUIObj(prepareUI);
+    }
+
+    private void LoadUIObj(GameObject val)
+    {
+        DestroyCurUI();
+        HideAllUI();
+        GameObject obj = Instantiate(val, transform);
+        obj.GetComponent<RectTransform>().localPosition = duelFieldUI.GetComponent<RectTransform>().position;
+        obj.GetComponent<RectTransform>().localScale = duelFieldUI.GetComponent<RectTransform>().localScale;
+
+        obj.transform.SetAsFirstSibling();
+        curUI = obj;
     }
 }

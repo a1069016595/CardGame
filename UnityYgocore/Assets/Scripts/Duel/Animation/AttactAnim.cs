@@ -121,6 +121,7 @@ public class AttactAnim : MonoBehaviour
     IEnumerator Wait(normalDele dele)
     {
         yield return new WaitForSeconds(0.2f);
+        Duel.GetInstance().SetIsAnim(false);
         dele();
         gameObject.SetActive(false);
     }

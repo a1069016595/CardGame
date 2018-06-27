@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class OptionListUI : DuelUIOpearate, IDeselectHandler,IPointerExitHandler
+public class OptionListUI : DuelUIOpearate, IDeselectHandler, IPointerExitHandler
 {
 
     #region 单例
@@ -42,16 +42,24 @@ public class OptionListUI : DuelUIOpearate, IDeselectHandler,IPointerExitHandler
 
     public void OperateCard(OptionButton button)
     {
-        if(CanNotControl())
+        if (CanNotControl())
         {
             return;
         }
         string str = button.GetText();
-        if(IsSendMes())
+        if (IsSendMes())
         {
-            DuelEventSys.GetInstance.SendEvent(DuelEvent.netEvent_SendOperateCard, targetArea, targetRank, str, isMySelect);
+            if (str != ComStr.Operate_CheckList)
+            {
+                eventSys.SendEvent(DuelEvent.netEvent_SendOperateCard, targetArea, targetRank, str, isMySelect);
+            }
         }
-        DuelEventSys.GetInstance.SendEvent(DuelEvent.event_operateCard, targetArea, targetRank, str, isMySelect);
+
+        eventSys.SendEvent(DuelEvent.duelEvent_RecordOperate, RecordEvent.recordEvent_OperateCard, targetArea, targetRank, str, isMySelect);
+        if(str!=ComStr.Operate_CheckList)
+        {
+            eventSys.SendEvent(DuelEvent.duelEvent_operateCard, targetArea, targetRank, str, isMySelect);
+        }
         HideOptionList();
     }
 
@@ -62,11 +70,15 @@ public class OptionListUI : DuelUIOpearate, IDeselectHandler,IPointerExitHandler
     /// <param name="rank">顺序</param>
     public void ShowOptionList(int area, int rank, Vector3 pos, bool isMy)
     {
+        if(Duel.GetInstance().isFinishGame)
+        {
+            return;
+        }
         gameObject.SetActive(true);
         targetArea = area;
         targetRank = rank;
         List<string> list = new List<string>();
-        list = DuelEventSys.GetInstance.ClickButton_GetOperateList(targetArea, targetRank, isMy);
+        list = Duel.GetInstance().GetCardOption(targetArea, targetRank, isMy);
         if (list.Count == 0)
         {
             return;

@@ -3,22 +3,10 @@ using System.Collections;
 using UnityEngine.UI;
 using Protocol;
 using System.Collections.Generic;
-public class ChatUI : MonoBehaviour,IHandler
+public class ChatUI : MonoSingleton<ChatUI>, IHandler
 {
-       #region 单例
-    private static ChatUI instance;
 
-    public ChatUI()
-    {
-        instance = this;
-    }
 
-    public static ChatUI GetInstance()
-    {
-        return instance;
-    }
-    #endregion
-    
     public InputField inputField;
     public Button okButton;
 
@@ -43,13 +31,12 @@ public class ChatUI : MonoBehaviour,IHandler
         string mes = inputField.text;
         ChatMesDTO dto = new ChatMesDTO();
         dto.mes = mes;
-        NetWorkScript.Instance.write(TypeProtocol.TYPE_GAMEHALL_BRQ,0,GameHallProtocol.GAMEHALL_CHAT_BRQ,dto);
+        NetWorkScript.Instance.write(TypeProtocol.TYPE_GAMEHALL_BRQ, 0, GameHallProtocol.GAMEHALL_CHAT_BRQ, dto);
         inputField.text = "";
     }
 
     public void MessageReceive(SocketModel model)
     {
-        Debug.Log("gg");
         ChatMesDTO dto = model.GetMessage<ChatMesDTO>();
         string mes = dto.userName + ":" + dto.mes;
 

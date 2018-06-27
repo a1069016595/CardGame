@@ -36,8 +36,9 @@ public class Prefeb_Room : MonoBehaviour
     /// </summary>
     void OnButton()
     {
-        if(roomState=="正在游戏")
+        if (roomState == "正在游戏" || roomState == "准备开始")
             return;
+
         NetWorkScript.Instance.write(TypeProtocol.TYPE_GAMEHALL_BRQ, 0, GameHallProtocol.GAMEHALL_ENTERROOM_BRQ, roomID);
     }
 }

@@ -137,8 +137,25 @@ public class Card_Field : BaseCard,IPointerExitHandler
                 break;
         }
         myPutType = cardPutType;
+        CheckVisual(cardPutType);
     }
 
+    private void CheckVisual( int cardPutType)
+    {
+        if(isMy)
+        {
+            isVisual = true;
+            return;
+        }
+        if(cardPutType==ComVal.CardPutType_layBack||cardPutType==ComVal.CardPutType_UpRightBack)
+        {
+            isVisual = false;
+        }
+        else
+        {
+            isVisual = true;
+        }
+    }
 
     /// <summary>
     /// 用于怪兽卡显示自己的攻击力，防守与星阶
@@ -250,13 +267,16 @@ public class Card_Field : BaseCard,IPointerExitHandler
 
     void OnMouseOver()
     {
-        DuelEventSys.GetInstance.OnOver_updateSelectCardShow(id);
-        DuelEventSys.GetInstance.SendEvent(DuelEvent.uiEvent_ShowFieldCardMes,isMy, curArea, curRank,  transform.parent.GetComponent<RectTransform>().anchoredPosition);
-        if(!Input.GetMouseButtonDown(0))
+        if (isVisual)
+        {
+            DuelEventSys.GetInstance.SendEvent(DuelEvent.uiEvent_UpdateSelectCardShow, id);
+            DuelEventSys.GetInstance.SendEvent(DuelEvent.uiEvent_ShowFieldCardMes, isMy, curArea, curRank, transform.parent.GetComponent<RectTransform>().anchoredPosition);
+        }
+        if (!Input.GetMouseButtonDown(0))
         {
             return;
         }
-        
+
         if (isInSelect)
         {
             if (isSelect)
@@ -281,11 +301,11 @@ public class Card_Field : BaseCard,IPointerExitHandler
     /// <summary>
     /// 进入选择状态
     /// </summary>
-    public void EnterSelectState()
+    public void EnterSelectState(bool isMySelect)
     {
         isInSelect = true;
         isSelect = false;
-        selectAnim.StartSelectState();
+        selectAnim.StartSelectState(isMySelect);
     }
     /// <summary>
     /// 结束选择状态
@@ -314,9 +334,9 @@ public class Card_Field : BaseCard,IPointerExitHandler
         curRank = rank;
     }
 
-    public void ShowDashAnim()
+    public void ShowDashAnim(bool isMySelect)
     {
-        selectAnim.StartSelectState();
+        selectAnim.StartSelectState(isMySelect);
     }
 
     public void HideDashAnim()

@@ -50,7 +50,7 @@ public class HandCardUI : MonoBehaviour
     /// <param name="cardType"></param>
     /// <param name="num"></param>
     /// <param name="dele"></param>
-    public void SelectFieldCard(List<int> list)
+    public void SelectFieldCard(List<int> list,bool isMySelect)
     {
         if (list.Count == 0)
         {
@@ -66,7 +66,7 @@ public class HandCardUI : MonoBehaviour
                 Debug.Log("error");
                 return;
             }
-            cardHand.EnterSelectState();
+            cardHand.EnterSelectState(isMySelect);
         }
     }
 
@@ -126,14 +126,23 @@ public class HandCardUI : MonoBehaviour
         float val = cardList.Count > 7 ? cardSizeX / 2 * 8 : cardSizeX / 2 * (cardList.Count + 1);
         if (!isMy)
             val = -val;
-        prefeb.rectTransform.anchoredPosition3D = new Vector3(val,0,0);
+        prefeb.rectTransform.anchoredPosition3D = new Vector3(val, 0, 0);
         prefeb.rectTransform.sizeDelta = new Vector2(cardSizeX, cardSizeY);
         prefeb.rectTransform.localScale = Vector3.one;
         prefeb.Init(this, isMy);
-        if (isMy)
-            prefeb.SetTexture(id, true);
+
+        if (Duel.GetInstance().IsNetWork)
+        {
+            if (isMy)
+                prefeb.SetTexture(id, true);
+            else
+                prefeb.SetOverTexture(id);
+        }
         else
+        {
             prefeb.SetTexture(id, true);
+            //prefeb.SetOverTexture(id);
+        }
         cardList.Add(prefeb);
         SortCard();
     }
@@ -239,11 +248,11 @@ public class HandCardUI : MonoBehaviour
     /// <summary>
     /// 显示手牌的虚线框动画
     /// </summary>
-    public void ShowCardDashAnim(List<int> list)
+    public void ShowCardDashAnim(List<int> list,bool isMySelect)
     {
         foreach (var item in list)
         {
-            cardList[item].ShowDashAnim();
+            cardList[item].ShowDashAnim(isMySelect);
         }
     }
 

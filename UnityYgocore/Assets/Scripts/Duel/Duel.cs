@@ -7,7 +7,10 @@ using UnityEngine.UI;
 using Protocol;
 using System.Linq;
 
-
+/// <summary>
+/// 
+/// </summary>
+/// <param name="card"></param>
 
 public delegate void CardDele(Card card);
 public delegate void normalDele();
@@ -16,11 +19,17 @@ public delegate bool Filter(Card card);
 //public delegate bool Filter(Card card,Card effectCard);
 public delegate void IntDele(int val);
 
+public enum GameState
+{
+    netWork,
+    playBack,
+    single,
+}
 
 /// <summary>
 /// 处理游戏的逻辑
 /// </summary>
-public class Duel : MonoBehaviour, IDuel
+public class Duel : BaseMonoBehivour, IDuel
 {
     #region 单例
     private static Duel instance;
@@ -45,7 +54,7 @@ public class Duel : MonoBehaviour, IDuel
     public Player player1;
     public Player player2;
 
-
+    public bool isFinishGame = false;
     /// <summary>
     /// 当前阶段
     /// </summary>
@@ -72,7 +81,17 @@ public class Duel : MonoBehaviour, IDuel
 
     List<Code> waitToCode = new List<Code>();
 
-    public bool isInAnim = false;
+    private bool isInAnim = false;
+
+    public void SetIsAnim(bool val)
+    {
+        isInAnim = val;
+    }
+
+    public bool IsInAnim()
+    {
+        return isInAnim;
+    }
 
     List<BaseEffect> resetEffectList;
     List<LimitPlayerEffect> limitEFfectList;
@@ -86,13 +105,27 @@ public class Duel : MonoBehaviour, IDuel
 
     Stack<DuelDele> delegateStack;
 
-    DuelEventSys duelEventSys;
 
     #endregion
 
     public int deleCount;
 
-    public bool IsNetWork = false;
+    public bool IsNetWork
+    {
+        get { return curGameState == GameState.netWork; }
+    }
+
+    public bool IsPlayBack
+    {
+        get { return curGameState == GameState.playBack; }
+    }
+
+    public bool IsSingle
+    {
+        get { return curGameState == GameState.single; }
+    }
+
+    public GameState curGameState;
 
     Console console;
 
@@ -101,31 +134,39 @@ public class Duel : MonoBehaviour, IDuel
     void Awake()
     {
         delegateStack = new Stack<DuelDele>();
-        duelUIManager = DuelUIManager.GetInstance();
+        duelUIManager = transform.GetComponent<DuelUIManager>();
         resetEffectList = new List<BaseEffect>();
         limitEFfectList = new List<LimitPlayerEffect>();
 
-        duelEventSys = DuelEventSys.GetInstance;
 
-        duelEventSys.clickButton_GetOperateList += GetCardOption;
+        AddHandler(DuelEvent.duelEvent_changePhase, ChangeToPhase);
+        AddHandler(DuelEvent.duelEvent_operateCard, OperateCard);
+        AddHandler(DuelEvent.duelEvent_Surrender, PlayerSurrender);
 
-        duelEventSys.AddHandler(DuelEvent.event_changePhase, ChangeToPhase);
-        duelEventSys.AddHandler(DuelEvent.event_operateCard, OperateCard);
+        AddHandler(DuelEvent.netEvent_ReciveOperateCard, ReciveOperateCard);
+        AddHandler(DuelEvent.netEvent_ReciveChangePhase, ReciveChangePhase);
+        AddHandler(DuelEvent.netEvent_ReciveGameEnd, ReciveGameEnd);
+        AddHandler(DuelEvent.netEvent_ReciveSurrender, ReciveSurrender);
 
-        duelEventSys.AddHandler(DuelEvent.netEvent_ReciveOperateCard, ReciveOperateCard);
-        duelEventSys.AddHandler(DuelEvent.netEvent_ReciveChangePhase, ReciveChangePhase);
+        AddHandler(DuelEvent.playBackEvent_StartGame, StartPlayBack);
+        AddHandler(DuelEvent.playBackEvent_ChangePhase, PlayBackChangePhase);
+        AddHandler(DuelEvent.playBackEvent_OperateCard, PlayBackOperateCard);
+        AddHandler(DuelEvent.playBackEvent_Surrender, PlayBackSurrender);
+
         console = GetComponent<Console>();
     }
 
 
+
+
     void Start()
     {
-        player1 = new Player(true, "player1");
-        player2 = new Player(false, "player2");
-
-        StartGame(isShuffle);
-
-
+        if (curGameState == GameState.single)
+        {
+            Deck deck1 = DeckLoad.LoadDeck(TestMyDeck);
+            Deck deck2 = DeckLoad.LoadDeck(TestOtherDeck);
+            StartGame(deck1, deck2, "player1", "player2",true);
+        }
         // NetWorkScript.Instance.write(TypeProtocol.TYPE_DUEL_BRQ, 0, DuelProtocol.ChangePhase_BRQ, null);
     }
 
@@ -138,27 +179,62 @@ public class Duel : MonoBehaviour, IDuel
     {
         DuelOperateCardDTO dto = (DuelOperateCardDTO)args[0];
         OperateCard(dto.area, dto.rank, dto.str, false);
+
+        SendEvent(DuelEvent.duelEvent_RecordOperate, RecordEvent.recordEvent_OperateCard, dto.area, dto.rank, dto.str, false);
     }
 
     private void ReciveChangePhase(params object[] args)
     {
         DuelChangePhaseDTO dto = (DuelChangePhaseDTO)args[0];
         ChangeToPhase(dto.phase);
+
+    }
+
+    private void PlayBackOperateCard(params object[] args)
+    {
+        OperateCard(args);
+    }
+
+    private void PlayBackChangePhase(params object[] args)
+    {
+        if((int)args[0]==roundCount)//确认是否为该回合
+        {
+            ChangeToPhase(args[1]);
+        }
     }
 
 
+    private void StartPlayBack(params object[] args)
+    {
+        curGameState = GameState.playBack;
+        string player1Name = (string)args[0];
+        string player2Name = (string)args[1];
+
+        Deck deck1 = (Deck)args[2];
+        Deck deck2 = (Deck)args[3];
+        bool isMyRound = (bool)args[4];
+
+        StartGame(deck1, deck2, player1Name, player2Name, isMyRound);
+    }
+
 
     /// <summary>
-    /// 测试用
+    /// 单机或回放用
     /// </summary>
     /// <param name="_isSuffler"></param>
-    public void StartGame(bool _isSuffler)
+    public void StartGame(Deck deck1, Deck deck2, string p1, string p2, bool isMy)
     {
-        isShuffle = _isSuffler;
-        Deck deck1 = DeckLoad.LoadDeck(TestMyDeck);
-        Deck deck2 = DeckLoad.LoadDeck(TestOtherDeck);
-        isMyRound = true;
-        curPlayer = player1;
+        player1 = new Player(true, p1);
+        player2 = new Player(false, p2);
+        isMyRound = isMy;
+        if (isMyRound)
+        {
+            curPlayer = player1;
+        }
+        else
+        {
+            curPlayer = player2;
+        }
         FloatTextDele b = delegate()
         {
             normalDele d1 = delegate
@@ -167,13 +243,27 @@ public class Duel : MonoBehaviour, IDuel
                 ChangeToPhase(ComVal.Phase_Drawphase);
             };
             AddDelegate(d1, "转向抽卡阶段");
-            Init(deck1, deck2);
+            Init(deck1, deck2, p1, p2);
         };
         duelUIManager.ShowFloatText("决斗开始", b);
         curCode.code = ComVal.code_NoCode;
         InvokeRepeating("CheckPhaseChange", 0, 0.1f);
         roundCount = 1;
         duelUIManager.UpdateRoundCount(roundCount);
+    }
+
+
+    /// <summary>
+    /// 用于单机测试
+    /// </summary>
+    /// <param name="dto1"></param>
+    /// <param name="dto2"></param>
+    public void Init(Deck dto1, Deck dto2, string p1, string p2)
+    {
+        duelUIManager.InitBothLPUI(p1, p2);
+        InitDeck(dto1, dto2);
+        DrawCard(player1, 6);
+        DrawCard(player2, 6);
     }
 
     /// <summary>
@@ -184,20 +274,19 @@ public class Duel : MonoBehaviour, IDuel
     public void StartGame()
     {
         //猜拳逻辑由客户端实现
-        IsNetWork = true;
+        curGameState = GameState.netWork;
+
         GuessDele a = delegate(bool val)
         {
             if (val)
             {
                 isMyRound = true;
-                curPlayer = player1;
                 //猜完拳之后发送游戏开始信息
                 NetWorkScript.Instance.write(TypeProtocol.TYPE_DUEL_BRQ, 0, DuelProtocol.STARTGAME_BRQ, null);
             }
             else
             {
                 isMyRound = false;
-                curPlayer = player2;
             }
         };
         duelUIManager.StartGuessFirst(a);
@@ -219,15 +308,58 @@ public class Duel : MonoBehaviour, IDuel
         duelUIManager.ShowFloatText("决斗开始", b);
         curCode.code = ComVal.code_NoCode;
         InvokeRepeating("CheckPhaseChange", 0, 0.1f);
-
+        roundCount = 1;
+        duelUIManager.UpdateRoundCount(roundCount);
     }
+
+
+    /// <summary>
+    /// 用于联网测试
+    /// </summary>
+    /// <param name="dto1"></param>
+    /// <param name="dto2"></param>
+    public void Init(StartGameDTO dto)
+    {
+        Deck mDeck;
+        Deck oDeck;
+
+        string account1 = dto.deckMes1.accountName;
+        string account2 = dto.deckMes2.accountName;
+
+        player1 = new Player(true, account1);
+        player2 = new Player(false, account2);
+
+        if(isMyRound)
+        {
+            curPlayer = player1;
+        }
+        else
+        {
+            curPlayer = player2;
+        }
+        if (ComVal.account == account1)
+        {
+            duelUIManager.InitBothLPUI(account1, account2);
+            mDeck = new Deck(dto.deckMes1.deck.mainDeck, dto.deckMes1.deck.extraDeck);
+            oDeck = new Deck(dto.deckMes2.deck.mainDeck, dto.deckMes2.deck.extraDeck);
+        }
+        else
+        {
+            duelUIManager.InitBothLPUI(account2, account1);
+            mDeck = new Deck(dto.deckMes2.deck.mainDeck, dto.deckMes2.deck.extraDeck);
+            oDeck = new Deck(dto.deckMes1.deck.mainDeck, dto.deckMes1.deck.extraDeck);
+        }
+        InitDeck(mDeck, oDeck);
+        DrawCard(player1, 6);
+        DrawCard(player2, 6);
+    }
+
 
     /// <summary>
     /// 检测阶段变化
     /// </summary>
     private void CheckPhaseChange()
     {
-
         if (currentPhase == ComVal.Phase_Drawphase || currentPhase == ComVal.Phase_Standbyphase)
         {
             if (curCode.code == ComVal.code_NoCode && isInAnim == false)
@@ -282,7 +414,6 @@ public class Duel : MonoBehaviour, IDuel
         FloatTextDele a = delegate
        {
            CreateCode(null, curPlayer, ComVal.code_EnterDrawPhase, null, 0, null);
-
            DrawCard(curPlayer, 1);
            duelUIManager.PhaseCanControl();
            isInAnim = false;
@@ -374,6 +505,11 @@ public class Duel : MonoBehaviour, IDuel
             console.Log("切换阶段错误");
             return;
         }
+        if(phase>ComVal.Phase_Mainphase1)
+        {
+            SendEvent(DuelEvent.duelEvent_RecordOperate, RecordEvent.recordEvent_ChangePhase, roundCount, phase);
+        }
+
         currentPhase = phase;
         normalDele d = delegate
         {
@@ -438,48 +574,7 @@ public class Duel : MonoBehaviour, IDuel
 
     #endregion
 
-    /// <summary>
-    /// 用于单机测试
-    /// </summary>
-    /// <param name="dto1"></param>
-    /// <param name="dto2"></param>
-    public void Init(Deck dto1, Deck dto2)
-    {
-        duelUIManager.InitBothLPUI("player1", "player2");
-        InitDeck(dto1, dto2);
-        DrawCard(player1, 6);
-        DrawCard(player2, 6);
 
-    }
-
-    /// <summary>
-    /// 用于联网测试
-    /// </summary>
-    /// <param name="dto1"></param>
-    /// <param name="dto2"></param>
-    public void Init(StartGameDTO dto)
-    {
-        Deck mDeck;
-        Deck oDeck;
-
-        string account1 = dto.deckMes1.accountName;
-        string account2 = dto.deckMes2.accountName;
-        if (ComVal.account == account1)
-        {
-            duelUIManager.InitBothLPUI(account1, account2);
-            mDeck = new Deck(dto.deckMes1.deck.mainDeck, dto.deckMes1.deck.extraDeck);
-            oDeck = new Deck(dto.deckMes2.deck.mainDeck, dto.deckMes2.deck.extraDeck);
-        }
-        else
-        {
-            duelUIManager.InitBothLPUI(account2, account1);
-            mDeck = new Deck(dto.deckMes2.deck.mainDeck, dto.deckMes2.deck.extraDeck);
-            oDeck = new Deck(dto.deckMes1.deck.mainDeck, dto.deckMes1.deck.extraDeck);
-        }
-        InitDeck(mDeck, oDeck);
-        DrawCard(player1, 6);
-        DrawCard(player2, 6);
-    }
 
     Player GetPlayer(bool isMy)
     {
@@ -565,11 +660,21 @@ public class Duel : MonoBehaviour, IDuel
         duelUIManager.InitBothDeck(player1.group_MainDeck.GroupNum, player1.group_ExtraDeck.GroupNum,
         player2.group_MainDeck.GroupNum, player2.group_ExtraDeck.GroupNum);
 
-        //if (isShuffle)
+        if (isShuffle)
+        {
+            ShuffleDeck(player1);
+            ShuffleDeck(player2);
+        }
+
+        //for (int i = 0; i < player1.group_MainDeck.cardList.Count; i++)
         //{
-        //    ShuffleDeck(player1);
-        //    ShuffleDeck(player2);
+        //    Debug.Log(player1.group_MainDeck.cardList[i].cardName);
         //}
+
+        RecordStartGameMes mes = new RecordStartGameMes(player1.name, player2.name,
+                                                 player1.group_MainDeck.ToArray(), player1.group_ExtraDeck.ToArray(),
+                                                player2.group_MainDeck.ToArray(), player2.group_ExtraDeck.ToArray(), isMyRound);
+        SendEvent(DuelEvent.duelEvent_RecordOperate, RecordEvent.recordEvent_StartGame, mes);
     }
 
     /// <summary>
@@ -577,7 +682,7 @@ public class Duel : MonoBehaviour, IDuel
     /// </summary>
     public void ShuffleDeck(Player player)
     {
-        if (!isShuffle)
+        if (!IsSingle || !isShuffle)
         {
             return;
         }
@@ -594,6 +699,10 @@ public class Duel : MonoBehaviour, IDuel
         string str;
         str = "C" + card.cardID;
         Type a = Type.GetType(str);
+        if (a == null)
+        {
+            return;
+        }
         try
         {
             MethodInfo info = a.GetMethod("InitialEffect");
@@ -2053,12 +2162,12 @@ public class Duel : MonoBehaviour, IDuel
         int rank = (int)args[1];
         string operate = (string)args[2];
         bool isMy = (bool)args[3];
-
         if (!IsFree() || isInAnim)
         {
             console.Log("??");
             return;
         }
+        //Debug.Log(operate);
         switch (operate)
         {
             case ComStr.Operate_NormalSummon:
@@ -2271,7 +2380,6 @@ public class Duel : MonoBehaviour, IDuel
                 AddDelegate(d2, "伤害处理前");
                 CreateCode(c.ToGroup(), GetPlayer(isMy), ComVal.code_AttackDeclaration, card, ComVal.reason_AttackDestroy, null);
             };
-
             AddDelegate(d1, "1");
             duelUIManager.ShowAttackAnim(card.areaRank, c.areaRank, isMy, FinishHandle);
             isInAttackAnim = true;
@@ -2310,12 +2418,14 @@ public class Duel : MonoBehaviour, IDuel
 
     void Operate_LauchEffect(int area, int rank, bool isMy)
     {
+       
         if (area == ComVal.Area_Graveyard || area == ComVal.Area_Remove)
         {
             LuachAreaEffect(area);
             return;
         }
         Card card = GetPlayer(isMy).GetCard(area, rank);
+
         if (card.isSpell())
         {
             LauchEffect(card, card.ownerPlayer);
@@ -2324,9 +2434,9 @@ public class Duel : MonoBehaviour, IDuel
         {
             LauchEffect(card, card.ownerPlayer);
         }
-        else
+        else if(card.IsTrap())
         {
-
+            LauchEffect(card, card.ownerPlayer);
         }
     }
 
@@ -2923,7 +3033,8 @@ public class Duel : MonoBehaviour, IDuel
     }
 
     /// <summary>
-    /// 显示可以发动效果的卡片的虚线框动画
+    /// 提示可以发动效果的卡片的虚线框动画
+    /// 网络对战时，不会显示对方的提示
     /// </summary>
     /// <param name="group"></param>
     void ShowCanLauchEffectDash(List<Card> list, Player player)
@@ -2951,6 +3062,7 @@ public class Duel : MonoBehaviour, IDuel
                 fieldSpellList.Add(0);
             }
         }
+
         duelUIManager.ShowHandCardDashAnim(handCardList, player.isMy);
         duelUIManager.ShowFieldDashAnim(monsterCardList, ComVal.Area_Monster, player.isMy);
         duelUIManager.ShowFieldDashAnim(trapCardList, ComVal.Area_NormalTrap, player.isMy);
@@ -3233,20 +3345,20 @@ public class Duel : MonoBehaviour, IDuel
                 if (curChain.IsEffectDisable(effect))
                 {
                     curChain.RemoveEffect();
-                    duelEventSys.UpdateUI_ChainUI(curChain);
+                    duelUIManager.UpdateChainUI(curChain);
                     FinishHandle();
                 }
                 else
                 {
                     curChain.RemoveEffect();
-                    duelEventSys.UpdateUI_ChainUI(curChain);
+                    duelUIManager.UpdateChainUI(curChain);
                     OperateEffect(effect);
                 }
             };
             if (curChain.GetMaxChainNum() > 1)
             {
                 AddDelegate(d1, "处理动画");
-                duelEventSys.UIAnim_ChainAnim(FinishHandle);
+                duelUIManager.PlayChainAnim(FinishHandle);
             }
             else
             {
@@ -3667,7 +3779,7 @@ public class Duel : MonoBehaviour, IDuel
         curChain.AddToChain(e);
         if (curChain.chainNum > 0)
         {
-            duelEventSys.UpdateUI_ChainUI(curChain);
+            duelUIManager.UpdateChainUI(curChain);
         }
     }
 
@@ -3765,6 +3877,8 @@ public class Duel : MonoBehaviour, IDuel
         return card.cardType.IsBind(ComVal.CardType_Monster_XYZ);
     }
 
+    #region 游戏结束
+
     public void ReduceAllPlayerLP(float mVal, float oVal)
     {
         player1.ReduceLP(mVal, false);
@@ -3772,7 +3886,8 @@ public class Duel : MonoBehaviour, IDuel
 
         if (player1.LP == 0 && player2.LP == 0)
         {
-            duelUIManager.ShowMes("结束", "平局", null);
+            isFinishGame = true;
+            duelUIManager.ShowMes("结束", "平局", ShowSavePlayBackPanel);
         }
         else
         {
@@ -3781,10 +3896,75 @@ public class Duel : MonoBehaviour, IDuel
         }
     }
 
+    private void PlayBackSurrender(params object[] args)
+    {
+        bool val = (bool)args[0];
+
+        isFinishGame = true;
+        if (val)
+        {
+            duelUIManager.ShowMes("结束", "玩家[" + player1.name + "]投降", ShowSavePlayBackPanel);
+        }
+        else
+        {
+            duelUIManager.ShowMes("结束", "玩家[" + player2.name + "]投降", ShowSavePlayBackPanel);
+        }
+    }
+
+    private void ReciveSurrender(params object[] args)//对方投降
+    {
+        if (isFinishGame)
+        {
+            return;
+        }
+        SendEvent(DuelEvent.duelEvent_RecordOperate, RecordEvent.recordEvent_Surrender, false);
+        isFinishGame = true;
+        duelUIManager.ShowMes("结束", "对方投降了", ShowSavePlayBackPanel);
+    }
+ 
+
+    private void PlayerSurrender(params object[] args)//己方投降
+    {
+        if(isFinishGame)
+        {
+            return;
+        }
+        if(IsNetWork)
+        {
+            SendEvent(DuelEvent.netEvent_SendSurrender);
+            SendEvent(DuelEvent.netEvent_SendGameEnd);
+        }
+        SendEvent(DuelEvent.duelEvent_RecordOperate, RecordEvent.recordEvent_Surrender, true);
+        isFinishGame = true;
+        duelUIManager.ShowMes("结束", "你投降了", ShowSavePlayBackPanel);
+    }
+
+
     public void LostMatch(Player player)
     {
-        duelUIManager.ShowMes("结束", GetOpsitePlayer(player).name + "胜利", null);
+        if(player.isMy)
+        {
+            SendEvent(DuelEvent.netEvent_SendGameEnd);
+        }
+        isFinishGame = true;
+        duelUIManager.ShowMes("结束","玩家["+ GetOpsitePlayer(player).name + "]胜利", ShowSavePlayBackPanel);
     }
+
+    private void ReciveGameEnd(params object[] args)
+    {
+        isFinishGame = true;
+        duelUIManager.ShowMes("结束", "对方玩家失去连接", ShowSavePlayBackPanel);
+    }
+
+    private void ShowSavePlayBackPanel()
+    {
+        if(IsNetWork||IsSingle)
+        {
+            SendEvent(DuelEvent.duelEvent_ShowSavePlayBackPanel);
+        }
+    }
+
+    #endregion
 
     public bool IsSelect;
 
@@ -3852,4 +4032,5 @@ public class Duel : MonoBehaviour, IDuel
     }
 
     #endregion
+
 }
